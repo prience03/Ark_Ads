@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/adView"
+    android:layout_width="match_parent"
+    android:layout_height="65dp">
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical">
+
+        <com.xslczx.widget.ShapeImageView
+            android:id="@+id/ad_app_logo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            app:siv_round_radius="4dp"
+            app:siv_shape="rect"
+            tools:ignore="ContentDescription"
+            tools:src="@android:drawable/ic_btn_speak_now" />
+
+        <TextView
+            android:id="@+id/ad_platform"
+            android:layout_width="wrap_content"
+            android:padding="4dp"
+            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:background="@drawable/sdk_ad_tag_bg_green"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:ignore="SmallSp"
+            tools:text="wskj"
+            tools:visibility="visible" />
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ad_app_title"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            tools:text="做个广告不是很简单的事情吗" />
+
+        <TextView
+            android:id="@+id/ad_app_desc"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="2dp"
+            android:layout_weight="1"
+            android:alpha="0.8"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:textSize="12sp"
+            tools:text="呵呵,你开心就好" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:background="@drawable/sdk_ad_tag_bg_blue"
+            android:text="广告"
+            android:textColor="@android:color/white"
+            android:textSize="10sp"
+            tools:ignore="HardcodedText,SmallSp" />
+
+        <TextView
+            android:id="@+id/ad_app_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginStart="5dp"
+            android:background="@drawable/sdk_ad_btn_download"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            tools:text="浏览" />
+    </FrameLayout>
+</LinearLayout>

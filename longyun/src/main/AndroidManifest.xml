@@ -1,0 +1,43 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+          package="com.ark.adkit.polymers.longyun">
+    <application>
+
+        <provider
+                android:name="com.baidu.mobads.openad.FileProvider"
+                android:authorities="${applicationId}.bd.provider"
+                android:exported="false"
+                android:grantUriPermissions="true">
+            <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/bd_file_paths"/>
+        </provider>
+
+        <activity
+                android:name="com.baidu.mobads.AppActivity"
+                tools:replace="android:configChanges"
+                android:configChanges="keyboard|keyboardHidden|orientation"/>
+        <activity
+                android:name="com.ak.android.bridge.AKActivity"
+                tools:replace="android:configChanges"
+                android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <activity
+                android:name="com.longyun.adsdk.view.AdActivity"
+                tools:replace="android:configChanges"
+                android:configChanges="keyboard|keyboardHidden|orientation"/>
+
+        <activity
+                tools:replace="android:configChanges"
+                android:name="com.sogou.feedads.adpage.WebViewActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation"/>
+
+        <service
+                android:name="com.qq.e.comm.DownloadService"
+                android:exported="false"/>
+
+        <activity
+                tools:replace="android:configChanges"
+                android:name="com.qq.e.ads.ADActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize"/>
+    </application>
+</manifest>

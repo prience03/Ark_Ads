@@ -1,0 +1,74 @@
+def keystorePropertiesFile = rootProject.file('./pk/pk.properties')
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+android {
+    flavorDimensions "huawei"
+
+    defaultConfig {
+        manifestPlaceholders = [UMENG_CHANNEL_VALUE: "huawei"]
+    }
+
+    productFlavors {
+        oppo {}
+    }
+
+    /**
+     * 渠道包定制
+     */
+    productFlavors.all {
+        flavor ->
+            def channel = name.replaceAll("_", "")
+            flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: channel]
+            flavor.versionCode = android.defaultConfig.versionCode
+            flavor.versionName = android.defaultConfig.versionName
+    }
+
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(new File(keystoreProperties['storeFile']))
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        release {
+            minifyEnabled false
+            zipAlignEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        applicationVariants.all {
+            def projectName = 'video-wp'
+            def buildType = it.buildType.name
+            def fileName
+            def flavor = it.productFlavors[0].name.split("-")[0]
+            def destFile = new File(project.rootDir.parentFile.absolutePath + "/apks/${projectName}_${defaultConfig.versionCode}_v${defaultConfig.versionName}")
+            if (buildType == "release") {
+                it.getPackageApplication().outputDirectory = destFile
+            }
+            def channel = "${flavor}"
+            channel = channel.replaceAll('_', '')
+            it.outputs.each {
+                if (buildType == "release") {
+                    fileName = "${projectName}-${channel}-${buildType}.apk"
+                    println "${destFile.absolutePath}/${fileName}"
+                    //重新对apk命名。(适用于Gradle4.0以下版本)
+                    //it.outputFile = new File(it.outputFile.parent, fileName)
+                    //重新对apk命名。(适用于Gradle4.0（含）以上版本)如果你Gradle版本是4.0以下版本则将上面的一行代码放开并注释下面的这一行。
+                    it.outputFileName = fileName
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+          package="com.ark.adkit.polymers.gdt">
+    <application>
+        <service
+                android:name="com.qq.e.comm.DownloadService"
+                android:exported="false"/>
+        <activity
+                tools:replace="android:configChanges"
+                android:name="com.qq.e.ads.ADActivity"
+                android:configChanges="keyboard|keyboardHidden|orientation|screenSize"/>
+    </application>
+</manifest>

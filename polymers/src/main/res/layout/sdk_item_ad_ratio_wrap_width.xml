@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    tools:layout_width="140dp">
+
+    <com.xslczx.widget.RatioImageView
+        android:id="@+id/ad_app_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="1dp"
+        android:scaleType="centerCrop"
+        app:riv_height_to_width_ratio="1.5" />
+
+    <TextView
+        android:id="@+id/ad_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="1dp"
+        android:background="@drawable/sdk_ad_tag_bg"
+        android:gravity="center"
+        android:text="广告"
+        android:textColor="@android:color/white"
+        android:textSize="11sp"
+        tools:ignore="HardcodedText,SmallSp" />
+
+    <TextView
+        android:id="@+id/ad_platform"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:padding="4dp"
+        android:background="@drawable/sdk_ad_tag_bg_green"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone"
+        tools:ignore="SmallSp"
+        tools:text="wskj"
+        tools:visibility="visible" />
+</FrameLayout>

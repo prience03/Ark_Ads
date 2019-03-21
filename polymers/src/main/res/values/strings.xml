@@ -1,0 +1,4 @@
+<resources>
+    <string name="sdk_ad_cancel"> %ds | 跳过</string>
+    <string name="sdk_ad_canceled">跳过</string>
+</resources>

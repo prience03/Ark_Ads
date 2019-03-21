@@ -1,0 +1,20 @@
+{
+    "msg": null,
+    "res": {
+        "params": {
+            "ad_appid_all": "{\"ydt\":\"ydt\",\"ttad\":\"5007439\",\"gdt\":\"1106214907\",\"wskj\":\"APP18082429051774\",\"lyjh\":\"e433b7683e6bc88b238fc30c52068ec7\",\"ifly\":\"5b7e83b3\"}",
+            "ad_posid_native_list": "{\"ydt\":\"AZBZXXLH\",\"ttad\":\"907439189\",\"ifly\":\"37AAA0585DC055046C22B0D6CF0F3960\",\"wskj\":\"n9D9OW511486\",\"lyjh\":\"c26e8cd4e639d206c0cff1d46e3c474b\",\"gdt\":\"3090128580307826\"}",
+            "ad_posid_splash": "{\"ydt\":\"AZBZOPEN\",\"ttad\":\"807439842\",\"ifly\":\"4D3808498C6D36A861D1F422B241DB60\",\"wskj\":\"nQRj5Wo11485\",\"lyjh\":\"800e8a41a41726a88c0db7acbdb2d9c3\",\"gdt\":\"2060729462366984\"}",
+            "ad_posid_native_detail": "{\"ydt\":\"AZBZXXLS\",\"ttad\":\"907439189\",\"ifly\":\"140151065017D9D1863A4A7E9DA6BEB8\",\"wskj\":\"nNMSD7t11487\",\"lyjh\":\"4286b5230aaaf0e3423a1e6a5bcf01ea\",\"gdt\":\"8010239334358227\"}",
+            "ad_posid_video": "{\"ttad\":\"907439539\"}",
+            "ad_sort_splash_new": "[\"ttad\",\"ifly\",\"wskj\",\"lyjh\"]",
+            "ad_sort_native": "[\"gdt\",\"ifly\",\"wskj\",\"lyjh\"]",
+            "ad_sort_video": "[\"ttad\"]",
+            "ad_disable_all": "false",
+            "ad_disable_version": "2.8.2",
+            "ad_disable_channel": "[\"vivo\",\"huawei\"]"
+        },
+        "name": "光点视频壁纸"
+    },
+    "code": 0
+}

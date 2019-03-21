@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:id="@+id/fl_dialog"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"
+            android:background="@drawable/sdk_rcmd_bg_dialog"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:text="尝鲜新产品"
+                    android:textColor="#000000"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            <com.xslczx.widget.ShapeImageView
+                    android:id="@+id/iv_app_icon"
+                    android:layout_width="90dp"
+                    android:layout_height="90dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    app:siv_round_radius="8dp"
+                    app:siv_shape="rect"
+                    tools:ignore="ContentDescription"
+                    tools:src="@android:drawable/btn_dialog" />
+
+            <TextView
+                    android:id="@+id/tv_app_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="15dp"
+                    android:maxLines="1"
+                    android:textColor="#000000"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="最美证件照" />
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="10dp"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/sdk_rcmd_app_star"
+                        tools:ignore="ContentDescription" />
+
+                <TextView
+                        android:id="@+id/tv_app_rank"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:textColor="#999"
+                        android:textSize="12sp"
+                        tools:text="(15633)" />
+            </LinearLayout>
+
+            <TextView
+                    android:id="@+id/tv_app_desc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:ellipsize="end"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:textColor="#666"
+                    android:textSize="14sp"
+                    tools:text="限时免费，专业的证件照制作软件限时免费，专业的证件照制作软件" />
+
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/btn_app_install"
+                android:layout_width="200dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center_horizontal|bottom"
+                android:layout_margin="20dp"
+                android:background="@drawable/sdk_bg_install"
+                android:gravity="center"
+                android:text="安装"
+                android:textColor="#fff"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <ImageView
+            android:id="@+id/btn_close"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="top|end"
+            android:src="@drawable/sdk_rcmd_dialog_close"
+            tools:ignore="ContentDescription" />
+
+</FrameLayout>
