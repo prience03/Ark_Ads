@@ -9,7 +9,7 @@ import com.ark.adkit.polymers.polymer.constant.ADKey;
 
 public class ADTool {
 
-    public static int index = 0;
+    public static int index = 1;
     private static ADTool sADTool;
     private String mLocalConfig;
     private boolean isDebugMode;

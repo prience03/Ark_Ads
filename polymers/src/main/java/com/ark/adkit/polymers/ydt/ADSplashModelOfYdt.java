@@ -21,10 +21,9 @@ import com.ark.adkit.polymers.ydt.utils.DeviceUtils;
 import com.ark.adkit.polymers.ydt.utils.Logger;
 import com.ark.adkit.polymers.ydt.utils.YdtUtils;
 import com.ark.dict.Utils;
-import com.ark.net.urlconn.StringCallback;
-import com.yanzhenjie.kalle.Kalle;
-import com.yanzhenjie.kalle.StringBody;
-import com.yanzhenjie.kalle.simple.SimpleResponse;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpPost;
+import com.koushikdutta.ion.Ion;
 import org.json.JSONObject;
 
 public class ADSplashModelOfYdt extends ADSplashModel {
@@ -42,7 +41,8 @@ public class ADSplashModelOfYdt extends ADSplashModel {
     }
 
     @NonNull
-    private ADSplashModelOfYdt init(@NonNull ViewGroup viewGroup, @NonNull final SplashAdView.SplashCallBack splashCallBack) {
+    private ADSplashModelOfYdt init(@NonNull ViewGroup viewGroup,
+            @NonNull final SplashAdView.SplashCallBack splashCallBack) {
         this.splashCallBack = splashCallBack;
         splashAdView = new SplashAdView(viewGroup.getContext());
         viewGroup.removeAllViews();
@@ -67,37 +67,41 @@ public class ADSplashModelOfYdt extends ADSplashModel {
 
     private void loadIpAddress(final boolean loadSplash) {
         AQuery aQuery = new AQuery(mContext);
-        aQuery.ajax("http://pv.sohu.com/cityjson?ie=utf-8", String.class, new AjaxCallback<String>() {
-            @Override
-            public void callback(String url, String object, AjaxStatus status) {
-                super.callback(url, object, status);
-                try {
-                    int start = object.indexOf("{");
-                    int end = object.indexOf("}");
-                    JSONObject jsonObject = new JSONObject(object.substring(start, end + 1));
-                    ip = jsonObject.optString("cip", "");
-                    Logger.i("logger", "ip load success:" + ip);
-                    sharedPreferences.edit().putString("ip_address", ip)
-                            .putLong("ip_request_time", System.currentTimeMillis()).apply();
-                } catch (Exception e) {
-                    Logger.e("logger", "ip load failed");
-                }
-                if (loadSplash) {
-                    loadSplashAd();
-                }
-            }
-        });
+        aQuery.ajax("http://pv.sohu.com/cityjson?ie=utf-8", String.class,
+                new AjaxCallback<String>() {
+                    @Override
+                    public void callback(String url, String object, AjaxStatus status) {
+                        super.callback(url, object, status);
+                        try {
+                            int start = object.indexOf("{");
+                            int end = object.indexOf("}");
+                            JSONObject jsonObject = new JSONObject(
+                                    object.substring(start, end + 1));
+                            ip = jsonObject.optString("cip", "");
+                            Logger.i("logger", "ip load success:" + ip);
+                            sharedPreferences.edit().putString("ip_address", ip)
+                                    .putLong("ip_request_time", System.currentTimeMillis()).apply();
+                        } catch (Exception e) {
+                            Logger.e("logger", "ip load failed");
+                        }
+                        if (loadSplash) {
+                            loadSplashAd();
+                        }
+                    }
+                });
     }
 
     private void loadSplashAd() {
-        Kalle.post(UrlConst.URL)
-                .body(new StringBody(new YdtUtils(mContext).getBody(mConfig.subKey)))
-                .perform(new StringCallback<String>(mContext) {
+        Ion.with(mContext)
+                .load(AsyncHttpPost.METHOD, UrlConst.URL)
+                .setStringBody(new YdtUtils(mContext).getBody(mConfig.subKey))
+                .asString()
+                .setCallback(new FutureCallback<String>() {
                     @Override
-                    public void onResponse(SimpleResponse<String, String> response) {
+                    public void onCompleted(Exception e, String result) {
                         AdResp entity = null;
-                        if (response.isSucceed()) {
-                            entity = AdResp.parseJson(response.succeed());
+                        if (!TextUtils.isEmpty(result)) {
+                            entity = AdResp.parseJson(result);
                         }
                         if (entity != null && entity.ads != null && !entity.ads.isEmpty()) {
                             if (splashCallBack != null) {

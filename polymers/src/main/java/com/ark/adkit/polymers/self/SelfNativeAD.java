@@ -3,11 +3,11 @@ package com.ark.adkit.polymers.self;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import com.ark.adkit.basics.utils.AppUtils;
-import com.ark.net.urlconn.StringCallback;
-import com.yanzhenjie.kalle.Kalle;
-import com.yanzhenjie.kalle.Url;
-import com.yanzhenjie.kalle.simple.SimpleResponse;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpGet;
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,25 +38,27 @@ public class SelfNativeAD {
             }
             return;
         }
-        Url.Builder builder = Url.newBuilder(SELF_URL);
-        builder.addQuery("code", getCodeByStyle(selfStyle));
-        builder.addQuery("sys", "android");
-        builder.addQuery("bundleid", mContext.getPackageName());
-        builder.addQuery("channel", AppUtils.getChannel(mContext));
-        builder.addQuery("language", AppUtils.getLanguage(mContext));
-        builder.addQuery("appvercode", AppUtils.getVersionCode(mContext) + "");
-        builder.addQuery("sysname", Build.VERSION.RELEASE);
-        builder.addQuery("sysver", Build.VERSION.SDK_INT + "");
-        builder.addQuery("sysmodel", AppUtils.getModel());
-        builder.addQuery("skip", String.valueOf(0));
-        builder.addQuery("limit", String.valueOf(999));
-        Kalle.get(builder.build())
-                .perform(new StringCallback<String>(mContext) {
+        Ion.with(mContext)
+                .load(AsyncHttpGet.METHOD, SELF_URL)
+                .addQuery("code", getCodeByStyle(selfStyle))
+                .addQuery("sys", "android")
+                .addQuery("bundleid", mContext.getPackageName())
+                .addQuery("channel", AppUtils.getChannel(mContext))
+                .addQuery("language", AppUtils.getLanguage(mContext))
+                .addQuery("appvercode", AppUtils.getVersionCode(mContext) + "")
+                .addQuery("sysname", Build.VERSION.RELEASE)
+                .addQuery("sysver", Build.VERSION.SDK_INT + "")
+                .addQuery("sysmodel", AppUtils.getModel())
+                .addQuery("skip", String.valueOf(0))
+                .addQuery("limit", String.valueOf(999))
+                .setTimeout(5000)
+                .asString()
+                .setCallback(new FutureCallback<String>() {
                     @Override
-                    public void onResponse(final SimpleResponse<String, String> response) {
-                        if (response.isSucceed()) {
+                    public void onCompleted(Exception e, String result) {
+                        if (!TextUtils.isEmpty(result)) {
                             List<SelfDataRef> list = SelfUtils
-                                    .getNovaInfo(response.succeed());
+                                    .getNovaInfo(result);
                             mList.clear();
                             for (SelfDataRef selfDataRef : list) {
                                 if (!selfDataRef.isClickOver()
@@ -70,7 +72,7 @@ public class SelfNativeAD {
                             }
                         } else {
                             if (adListener != null) {
-                                adListener.onAdFailed(-1, response.failed());
+                                adListener.onAdFailed(-1, "fail");
                             }
                         }
                     }

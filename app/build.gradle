@@ -16,6 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
     lintOptions {
         abortOnError false
     }
@@ -29,16 +34,22 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-    implementation 'com.github.xslczx:dict:1.0.4'
-    implementation 'com.github.xslczx:webview:1.0.4'
-    implementation 'com.github.xslczx:envelope:1.0.1'
-    implementation 'com.github.xslczx:permissions:1.0.1'
     implementation 'com.tencent:mmkv:1.0.17'
-    implementation project (':polymers')
+    /*implementation project (':polymers')
     implementation project(':ttad')
     implementation project(':iflytek')
     implementation project(':longyun')
     implementation project(':zhaocai')
-    implementation project(':gdt')
-    implementation project(':basics')
+    implementation project(':gdt')*/
+    
+    implementation 'com.ark.custom:permissions:1.0.0'
+    implementation 'com.ark.custom:kvalue:1.0.0'
+    implementation 'com.ark.custom:webview:1.0.0'
+
+    implementation 'com.ark.ads:core:1.0.0'
+    implementation 'com.ark.ads:iflytek:1.0.0'
+    implementation 'com.ark.ads:longyun:1.0.0'
+    implementation 'com.ark.ads:zhaocai:1.0.0'
+    implementation 'com.ark.ads:gdt:1.0.0'
+    implementation 'com.ark.ads:ttad:1.0.0'
 }

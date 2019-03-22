@@ -8,10 +8,9 @@ import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.ydt.constant.UrlConst;
 import com.ark.adkit.polymers.ydt.entity.AdResp;
 import com.ark.adkit.polymers.ydt.utils.YdtUtils;
-import com.ark.net.urlconn.StringCallback;
-import com.yanzhenjie.kalle.Kalle;
-import com.yanzhenjie.kalle.StringBody;
-import com.yanzhenjie.kalle.simple.SimpleResponse;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpPost;
+import com.koushikdutta.ion.Ion;
 
 public class ADNativeModelOfYdt extends ADNativeModel {
 
@@ -32,14 +31,16 @@ public class ADNativeModelOfYdt extends ADNativeModel {
             ydtUtils = new YdtUtils(context);
         }
         String body = ydtUtils.getBody(mConfig.subKey);
-        Kalle.post(UrlConst.URL)
-                .body(new StringBody(body))
-                .perform(new StringCallback<String>(context) {
+        Ion.with(context)
+                .load(AsyncHttpPost.METHOD, UrlConst.URL)
+                .setStringBody(body)
+                .asString()
+                .setCallback(new FutureCallback<String>() {
                     @Override
-                    public void onResponse(SimpleResponse<String, String> response) {
+                    public void onCompleted(Exception e, String result) {
                         AdResp entity = null;
-                        if (response.isSucceed()) {
-                            entity = AdResp.parseJson(response.succeed());
+                        if (!TextUtils.isEmpty(result)) {
+                            entity = AdResp.parseJson(result);
                         }
                         if (entity != null && entity.ads != null && !entity.ads.isEmpty()) {
                             if (mConfig.platform != null) {

@@ -8,9 +8,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -35,19 +33,41 @@ dependencies {
     compileOnly  'com.umeng.umsdk:analytics:8.0.0'
 }
 
-apply plugin: 'com.novoda.bintray-release'
-
-publish {
-    artifactId = 'basics'
-    userOrg = rootProject.userOrg
-    groupId = rootProject.groupId
-    publishVersion = rootProject.adkitVer
-    repoName = rootProject.repoName
-    desc = rootProject.description
-    website = rootProject.website
-    licences = rootProject.licences
+Properties properties = new Properties()
+InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream()
+properties.load(inputStream)
+def key_userName = properties.getProperty('userName')
+def key_password = properties.getProperty('password')
+apply plugin: 'maven'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "http://nexus.xiaoc.cn/repository/maven-releases/") {
+                authentication(userName: key_userName, password: key_password)
+            }
+            pom.groupId = 'com.ark.ads'
+            pom.artifactId = 'basics'
+            pom.version = '1.0.0'
+            pom.packaging = 'aar'
+        }
+    }
 }
-
-
-
-
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.sourceFiles
+}
+task androidJavadocsJar(type: Jar) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+uploadArchives.mustRunAfter('build')
+uploadArchives << {
+    println "Uploaded success"
+}

@@ -8,9 +8,7 @@ android {
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
@@ -36,20 +34,45 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    compileOnly project(':basics')
+    api 'com.ark.ads:basics:1.0.0'
     compileOnly fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
 }
 
-apply plugin: 'com.novoda.bintray-release'
-
-publish {
-    artifactId = 'plgdt'
-    userOrg = rootProject.userOrg
-    groupId = rootProject.groupId
-    publishVersion = rootProject.adkitVer
-    repoName = rootProject.repoName
-    desc = rootProject.description
-    website = rootProject.website
-    licences = rootProject.licences
+Properties properties = new Properties()
+InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream()
+properties.load(inputStream)
+def key_userName = properties.getProperty('userName')
+def key_password = properties.getProperty('password')
+apply plugin: 'maven'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "http://nexus.xiaoc.cn/repository/maven-releases/") {
+                authentication(userName: key_userName, password: key_password)
+            }
+            pom.groupId = 'com.ark.ads'
+            pom.artifactId = 'gdt'
+            pom.version = '1.0.0'
+            pom.packaging = 'aar'
+        }
+    }
 }
-
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.sourceFiles
+}
+task androidJavadocsJar(type: Jar) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+artifacts {
+    archives androidSourcesJar
+    archives androidJavadocsJar
+}
+uploadArchives.mustRunAfter('build')
+uploadArchives << {
+    println "Uploaded success"
+}

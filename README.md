@@ -3,15 +3,15 @@
 ## 使用方法
 ### Gradle
 ```groovy
-maven { url "https://dl.bintray.com/cherish/maven" }
+maven { url 'http://nexus.xiaoc.cn/repository/maven-releases/'}
 
-implementation 'com.github.xslczx:basics:1.2.4'
-implementation 'com.github.xslczx:polymers:1.2.4'
-implementation 'com.github.xslczx:plifly:1.2.4'
-implementation 'com.github.xslczx:pllongyun:1.2.4'
-implementation 'com.github.xslczx:plzhaocai:1.2.4'
-implementation 'com.github.xslczx:plttad:1.2.4'
-implementation 'com.github.xslczx:plgdt:1.2.4'
+implementation 'com.ark.ads:imageview:1.0.0'
+implementation 'com.ark.ads:polymers:1.0.0'
+implementation 'com.ark.ads:plttad:1.0.0'
+implementation 'com.ark.ads:pllongyun:1.0.0'
+implementation 'com.ark.ads:plzhaocai:1.0.0'
+implementation 'com.ark.ads:plgdt:1.0.0'
+implementation 'com.ark.ads:plifly:1.0.0'
 ```
 ### 初始化SDK，非必须
 ```java
@@ -69,4 +69,32 @@ boolean hasAd=ADTool.getADTool()
         .getManager()
         .getConfigWrapper()
         .hasAd();
+```
+##### 4.交叉推广
+```java
+new SelfNativeAD(this, SelfADStyle.INTER_RECOMMEND)
+        .setListener(new SelfNativeAD.ADListener() {
+                @Override
+                public void onAdLoad(List<SelfDataRef> dataRefs) {
+                        if (dataRefs != null && dataRefs.size() > 0) {
+                            SelfDataRef selfDataRef = dataRefs.get(0);
+                            RecommendDialog recommendDialog = new RecommendDialog(
+                                    context);
+                            recommendDialog.setBundle(selfDataRef);
+                            recommendDialog.show();
+                        }
+                    }
+
+                @Override
+                public void onAdFailed(int errorCode, @NonNull String errorMsg) {
+
+                }
+        }).loadAllADList();
+```
+##### 5.可能出现的冲突解决
+```xml
+<activity
+            android:name="com.baidu.mobads.AppActivity"
+            tools:replace="android:configChanges"
+            android:configChanges="keyboard|keyboardHidden|orientation"/>
 ```

@@ -116,11 +116,10 @@ public abstract class NativeWrapper {
             Collections.shuffle(sort);
             LogUtils.i("随机顺序" + sort);
         } else if (strategy == Strategy.cycle) {
-            if (ADTool.index >= sort.size()) {
+            if (ADTool.index-- <= Integer.MIN_VALUE) {
                 ADTool.index = 0;
             }
             Collections.rotate(sort, ADTool.index);
-            ADTool.index++;
             LogUtils.i("位移顺序" + sort);
         } else if (strategy == Strategy.order) {
             LogUtils.i("默认顺序" + sort);
@@ -169,7 +168,7 @@ public abstract class NativeWrapper {
     public <T> void load(@NonNull final Context context,
             @NonNull final ViewGroup viewGroup, final int type,
             OnNativeListener<T> onNativeListener) {
-        ADMetaData nativeAD = null;
+        ADMetaData nativeAD;
         if (type == AD_VIDEO) {
             nativeAD = getVideoNative(context);
         } else if (type == AD_BANNER) {

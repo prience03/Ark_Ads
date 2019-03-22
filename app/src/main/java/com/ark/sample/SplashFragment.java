@@ -1,6 +1,5 @@
 package com.ark.sample;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -16,10 +15,6 @@ import android.view.Window;
 public class SplashFragment extends DialogFragment {
 
     private OnPreparedListener mListener;
-
-    public interface OnPreparedListener {
-        void onCreateView(ViewGroup rootView, ViewGroup adContainer);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,5 +61,10 @@ public class SplashFragment extends DialogFragment {
     @Override
     public void dismiss() {
         dismissAllowingStateLoss();
+    }
+
+    public interface OnPreparedListener {
+
+        void onCreateView(ViewGroup rootView, ViewGroup adContainer);
     }
 }

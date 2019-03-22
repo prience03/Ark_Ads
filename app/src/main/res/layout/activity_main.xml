@@ -29,6 +29,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
+    <Button
+            android:text="Rotate sort循环"
+            android:textAllCaps="false"
+            android:onClick="rotate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    <Button
+            android:text="Shuffle sort随机"
+            android:textAllCaps="false"
+            android:onClick="cycle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    <TextView
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
     <FrameLayout
             android:id="@+id/fl_container"
             android:layout_width="match_parent"

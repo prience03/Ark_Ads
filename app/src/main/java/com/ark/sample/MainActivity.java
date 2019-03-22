@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import com.ark.adkit.basics.configs.ADPlatform;
 import com.ark.adkit.basics.models.OnSplashImpl;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.polymer.interrcmd.RecommendDialog;
@@ -20,6 +22,7 @@ import com.ark.utils.permissions.PermissionChecker;
 import com.ark.utils.permissions.PermissionItem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SplashFragment.OnPreparedListener {
@@ -27,6 +30,9 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
     private FrameLayout fl;
     private FrameLayout banner;
     private SplashFragment mFragment;
+    private int mIndex = 1;
+    private TextView mTextView;
+    private List<String> mStringList = new ArrayList<>();
 
     private OnSplashImpl mOnSplashImpl = new OnSplashImpl() {
         @Override
@@ -40,8 +46,6 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
                 mFragment.dismissAllowingStateLoss();
                 mFragment = null;
             }
-            loadBanner();
-            loadNative();
         }
     };
 
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
         mFragment.show(getSupportFragmentManager(), "splash");
         fl = findViewById(R.id.fl_container);
         banner = findViewById(R.id.fl_banner);
+        mTextView = findViewById(R.id.text);
     }
 
     private void loadNative() {
@@ -96,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
                     public void onFinish() {
                         Toast.makeText(MainActivity.this, "所有权限已经获取", Toast.LENGTH_SHORT).show();
                         loadSplash(rootView, adContainer);
+                        loadBanner();
+                        loadNative();
                     }
 
                     @Override
@@ -153,5 +160,34 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
 
                     }
                 }).loadAllADList();
+    }
+
+    public void rotate(View view) {
+        mStringList.clear();
+        mStringList.add("1:"+ADPlatform.GDT);
+        mStringList.add("2:"+ADPlatform.IFLY);
+        mStringList.add("3:"+ADPlatform.LYJH);
+        mStringList.add("4:"+ADPlatform.SELF);
+        mStringList.add("5:"+ADPlatform.TTAD);
+        mStringList.add("6:"+ADPlatform.WSKJ);
+        mStringList.add("7:"+ADPlatform.YDT);
+        if (mIndex-- <= Integer.MIN_VALUE) {
+            mIndex = 0;
+        }
+        Collections.rotate(mStringList, mIndex);
+        mTextView.setText(mStringList.toString());
+    }
+
+    public void cycle(View view) {
+        mStringList.clear();
+        mStringList.add("1:"+ADPlatform.GDT);
+        mStringList.add("2:"+ADPlatform.IFLY);
+        mStringList.add("3:"+ADPlatform.LYJH);
+        mStringList.add("4:"+ADPlatform.SELF);
+        mStringList.add("5:"+ADPlatform.TTAD);
+        mStringList.add("6:"+ADPlatform.WSKJ);
+        mStringList.add("7:"+ADPlatform.YDT);
+        Collections.shuffle(mStringList);
+        mTextView.setText(mStringList.toString());
     }
 }

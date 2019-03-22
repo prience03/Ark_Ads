@@ -4,13 +4,6 @@ import android.app.Application;
 import com.ark.adkit.basics.configs.Strategy;
 import com.ark.adkit.basics.utils.JsonUtils;
 import com.ark.adkit.polymers.polymer.ADTool;
-import com.ark.net.urlconn.GsonConverter;
-import com.yanzhenjie.kalle.Kalle;
-import com.yanzhenjie.kalle.KalleConfig;
-import com.yanzhenjie.kalle.connect.BroadcastNetwork;
-import com.yanzhenjie.kalle.connect.http.LoggerInterceptor;
-import com.yanzhenjie.kalle.cookie.DBCookieStore;
-import com.yanzhenjie.kalle.urlconnect.URLConnectionFactory;
 
 public class App extends Application {
 
@@ -27,15 +20,14 @@ public class App extends Application {
             _instance = this;
         }
         initialize();
+    }
+
+    public void initialize() {
         ADTool.initialize(new ADTool.Builder()
                 .setDebugMode(true)
                 .setStrategy(Strategy.cycle)
                 .setLoadOtherWhenVideoDisable(false)
-                .setLocalConfig(JsonUtils.getJson(this,"config.json"))
+                .setLocalConfig(JsonUtils.getJson(this, "config.json"))
                 .build());
-    }
-
-    public void initialize() {
-
     }
 }

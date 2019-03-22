@@ -19,8 +19,8 @@ import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.self.SelfADStyle;
 import com.ark.adkit.polymers.self.SelfDataRef;
-import com.yanzhenjie.kalle.Kalle;
-import com.yanzhenjie.kalle.download.Callback;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
 
 import java.io.File;
 import java.util.Random;
@@ -118,36 +118,20 @@ public class RecommendDialog extends Dialog implements View.OnClickListener {
                 Toast.makeText(context, "正在下载" + selfDataRef.getAppTitle(), Toast.LENGTH_LONG)
                         .show();
                 File dir = FileUtils.getFileDir(context, "download");
-                Kalle.Download.get(url)
-                        .directory(dir.getAbsolutePath())
-                        .fileName(selfDataRef.getId() + ".apk")
-                        .perform(new Callback() {
+                Ion.with(context)
+                        .load(url)
+                        .write(new File(dir, selfDataRef.getId() + ".apk"))
+                        .setCallback(new FutureCallback<File>() {
                             @Override
-                            public void onStart() {
-
-                            }
-
-                            @Override
-                            public void onFinish(String path) {
-                                selfDataRef.recordInstall(SelfADStyle.INTER_RECOMMEND);
-                                AppUtils.installApk(context, new File(path));
-                            }
-
-                            @Override
-                            public void onException(Exception e) {
-                                LogUtils.e("下载失败" + e.getLocalizedMessage());
-                                Toast.makeText(context, selfDataRef.getAppTitle() + "下载失败",
-                                        Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onCancel() {
-
-                            }
-
-                            @Override
-                            public void onEnd() {
-
+                            public void onCompleted(Exception e, File result) {
+                                if (result != null && result.exists()) {
+                                    selfDataRef.recordInstall(SelfADStyle.INTER_RECOMMEND);
+                                    AppUtils.installApk(context, result);
+                                } else {
+                                    LogUtils.e("下载失败" + e.getLocalizedMessage());
+                                    Toast.makeText(context, selfDataRef.getAppTitle() + "下载失败",
+                                            Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
             }

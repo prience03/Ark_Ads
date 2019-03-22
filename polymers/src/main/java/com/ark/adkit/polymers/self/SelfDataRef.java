@@ -4,11 +4,10 @@ import android.text.TextUtils;
 import com.ark.adkit.basics.utils.AppUtils;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.dict.ArkKv;
-import com.ark.dict.ConfigMapLoader;
 import com.ark.dict.Utils;
-import com.ark.net.urlconn.StringCallback;
-import com.yanzhenjie.kalle.Kalle;
-import com.yanzhenjie.kalle.simple.SimpleResponse;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.async.http.AsyncHttpGet;
+import com.koushikdutta.ion.Ion;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -330,14 +329,16 @@ public class SelfDataRef implements Serializable {
      */
     private void analysis(final String url, final String pos) {
         if (!TextUtils.isEmpty(url)) {
-            Kalle.get(url)
-                    .perform(new StringCallback<String>(Utils.getContext()) {
+            Ion.with(Utils.getContext())
+                    .load(AsyncHttpGet.METHOD, url)
+                    .asString()
+                    .setCallback(new FutureCallback<String>() {
                         @Override
-                        public void onResponse(SimpleResponse<String, String> response) {
-                            if (response.isSucceed()) {
-                                LogUtils.i("自营广告统计成功: " + response.succeed());
+                        public void onCompleted(Exception e, String result) {
+                            if (!TextUtils.isEmpty(result)) {
+                                LogUtils.i("自营广告统计成功: " + result);
                             } else {
-                                LogUtils.w("自营广告统计失败，请检查: " + response.failed());
+                                LogUtils.w("自营广告统计失败，请检查");
                             }
                         }
                     });
