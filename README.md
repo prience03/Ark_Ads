@@ -5,13 +5,12 @@
 ```groovy
 maven { url 'http://nexus.xiaoc.cn/repository/maven-releases/'}
 
-implementation 'com.ark.ads:imageview:1.0.0'
-implementation 'com.ark.ads:polymers:1.0.0'
-implementation 'com.ark.ads:plttad:1.0.0'
-implementation 'com.ark.ads:pllongyun:1.0.0'
-implementation 'com.ark.ads:plzhaocai:1.0.0'
-implementation 'com.ark.ads:plgdt:1.0.0'
-implementation 'com.ark.ads:plifly:1.0.0'
+implementation 'com.ark.ads:core:1.0.0'
+implementation 'com.ark.ads:iflytek:1.0.0'
+implementation 'com.ark.ads:longyun:1.0.0'
+implementation 'com.ark.ads:zhaocai:1.0.0'
+implementation 'com.ark.ads:gdt:1.0.0'
+implementation 'com.ark.ads:ttad:1.0.0'
 ```
 ### 初始化SDK，非必须
 ```java
