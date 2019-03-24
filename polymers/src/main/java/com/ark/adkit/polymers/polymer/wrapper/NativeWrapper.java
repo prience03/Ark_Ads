@@ -177,7 +177,7 @@ public abstract class NativeWrapper {
                 } else {
                     nativeAD = getListNative(context);
                 }
-                Run.onUiSync(new Action() {
+                Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
                         switch (type) {

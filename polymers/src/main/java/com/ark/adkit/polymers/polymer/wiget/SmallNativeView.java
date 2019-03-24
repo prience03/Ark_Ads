@@ -3,7 +3,6 @@ package com.ark.adkit.polymers.polymer.wiget;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -49,6 +48,9 @@ public class SmallNativeView extends FrameLayout {
     }
 
     public void attachViewGroup(ViewGroup viewGroup, ADMetaData adMetas) {
+        if (viewGroup.getChildCount() > 0) {
+            viewGroup.removeAllViews();
+        }
         viewGroup.addView(this);
         this.mADData = adMetas;
         LayoutParams layoutParams = new LayoutParams(
@@ -94,23 +96,21 @@ public class SmallNativeView extends FrameLayout {
         });
     }
 
-    /**
-     * 更新布局
-     *
-     * @param metaData ADMetaData
-     */
-    private void updateUi(@NonNull ADMetaData metaData) {
-        String url = metaData.getImgUrl();
-        if (metaData instanceof ADMetaDataOfSelf) {
-            url = ((ADMetaDataOfSelf) metaData).getVerticalImage();
+    public void handleView() {
+        if (mADData == null) {
+            return;
+        }
+        String url = mADData.getImgUrl();
+        if (mADData instanceof ADMetaDataOfSelf) {
+            url = ((ADMetaDataOfSelf) mADData).getVerticalImage();
         }
         if (!TextUtils.isEmpty(url)) {
             new AQuery(imageView).image(url, true, true);
         }
         if (ADTool.getADTool().isDebugMode()) {
             tvPlatform.setVisibility(VISIBLE);
-            tvPlatform.setText(metaData.getPlatform());
+            tvPlatform.setText(mADData.getPlatform());
         }
-        metaData.handleView(this);
+        mADData.handleView(this);
     }
 }

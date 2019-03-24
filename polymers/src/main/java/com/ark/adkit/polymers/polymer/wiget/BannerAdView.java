@@ -47,6 +47,9 @@ public class BannerAdView extends FrameLayout {
     }
 
     public void attachViewGroup(ViewGroup viewGroup, ADMetaData adMetas) {
+        if (viewGroup.getChildCount() > 0) {
+            viewGroup.removeAllViews();
+        }
         viewGroup.addView(this);
         this.adMetaData = adMetas;
     }

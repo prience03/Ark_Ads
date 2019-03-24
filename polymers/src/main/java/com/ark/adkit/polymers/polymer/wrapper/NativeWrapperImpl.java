@@ -63,6 +63,7 @@ public class NativeWrapperImpl extends NativeWrapper {
         }
         SmallNativeView adView = new SmallNativeView(context);
         adView.attachViewGroup(viewGroup, adMetaData);
+        adView.handleView();
         if (onNativeListener != null) {
             onNativeListener.onSuccess(adMetaData);
         }

@@ -28,7 +28,7 @@ public class SimpleListAdapter extends BaseMultiItemQuickAdapter<SimpleData, Bas
                 frameLayout.removeAllViews();
                 ADTool.getADTool().getManager()
                         .getNativeWrapper()
-                        .loadNativeView(mContext, frameLayout);
+                        .loadVideoView(mContext, frameLayout);
                 break;
             case SimpleData.TYPE_DATA:
                 break;

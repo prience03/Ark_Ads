@@ -51,6 +51,9 @@ public class NativeAdView extends FrameLayout {
     }
 
     public void attachViewGroup(ViewGroup viewGroup,ADMetaData adMetas) {
+        if (viewGroup.getChildCount() > 0) {
+            viewGroup.removeAllViews();
+        }
         viewGroup.addView(this);
         this.adMetaData = adMetas;
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
