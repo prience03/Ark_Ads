@@ -3,6 +3,8 @@ package com.ark.adkit.polymers.iflytek;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.iflytek.voiceads.*;
@@ -45,7 +47,7 @@ public class ADNativeModelOfIflytek extends ADNativeModel {
     @Override
     public void loadData(@Nullable Context context, int count) {
         if (context == null) {
-            LogUtils.e("拉取广告被终止,当前上下文已被销毁");
+            LogUtils.e("ifly拉取广告被终止,当前上下文已被销毁");
             return;
         }
         if (TextUtils.isEmpty(mConfig.appKey) || TextUtils.isEmpty(mConfig.subKey) || TextUtils
@@ -58,14 +60,14 @@ public class ADNativeModelOfIflytek extends ADNativeModel {
                 Context lastContext = contextRef.get();
                 //上下文切换后重新初始化
                 if (lastContext == null || lastContext != context) {
-                    LogUtils.i("上下文变化,重新初始化");
+                    LogUtils.i("ifly上下文变化,重新初始化");
                     mNativeAD = new IFLYNativeAd(context, mConfig.subKey,
                             mListener);
                 }
             }
             contextRef = new WeakReference<>(context);
             if (mNativeAD == null) {
-                LogUtils.i("初始化广告");
+                LogUtils.i("ifly初始化广告");
                 mNativeAD = new IFLYNativeAd(context, mConfig.subKey, mListener);
             }
             mNativeAD.setParameter(AdKeys.APPID, mConfig.appKey);
@@ -73,10 +75,10 @@ public class ADNativeModelOfIflytek extends ADNativeModel {
                     String.valueOf(false));
             mNativeAD.setParameter(AdKeys.DOWNLOAD_ALERT, String.valueOf(false));
             mNativeAD.loadAd(count);
-            LogUtils.i("拉取广告中......");
+            LogUtils.i("ifly拉取广告中......");
         } catch (Exception e) {
             mNativeAD = null;
-            LogUtils.e("拉取广告时出错{" + e.getLocalizedMessage() + "}");
+            LogUtils.e("ifly拉取广告时出错{" + e.getLocalizedMessage() + "}");
         }
     }
 
@@ -84,12 +86,17 @@ public class ADNativeModelOfIflytek extends ADNativeModel {
     @Override
     public Object getData(@Nullable final Context context) {
         if (context == null) {
-            LogUtils.e("取出广告被终止,当前上下文已被销毁");
+            LogUtils.e("ifly取出广告被终止,当前上下文已被销毁");
             return null;
         }
         Object object = linkedQueue.poll();
         if (!isFast() && linkedQueue.isEmpty()) {
-            loadData(context, linkedQueue.isEmpty() ? 3 : 1);
+            Run.onUiAsync(new Action() {
+                @Override
+                public void call() {
+                    loadData(context, 1);
+                }
+            });
         }
         return object;
     }

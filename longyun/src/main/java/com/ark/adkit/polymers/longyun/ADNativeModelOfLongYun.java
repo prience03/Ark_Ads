@@ -3,6 +3,8 @@ package com.ark.adkit.polymers.longyun;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.longyun.juhe_sdk.interfaces.AdViewNativeListener;
@@ -83,8 +85,13 @@ public class ADNativeModelOfLongYun extends ADNativeModel {
             return null;
         }
         Object object = linkedQueue.poll();
-        if (!isFast() && linkedQueue.size() < 3) {
-            loadData(context, 3 - linkedQueue.size());
+        if (!isFast() && linkedQueue.peek() == null) {
+            Run.onUiAsync(new Action() {
+                @Override
+                public void call() {
+                    loadData(context, 3);
+                }
+            });
         }
         return object;
     }

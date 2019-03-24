@@ -33,6 +33,7 @@ public class ADMetaDataOfYdt extends ADMetaData {
 
     private final AdDataRef adDataRef;
     private final YdtUtils ydtUtils;
+    private int mDownX, mDownY, mUpX, mUpY;
 
     public ADMetaDataOfYdt(@NonNull AdDataRef adDataRef) {
         this.adDataRef = adDataRef;
@@ -251,13 +252,6 @@ public class ADMetaDataOfYdt extends ADMetaData {
 
     @Override
     public void handleClick(@NonNull ViewGroup viewGroup) {
-
-    }
-
-    @Override
-    public void handleClick(@NonNull ViewGroup viewGroup, @Nullable View clickableView,
-                            int mDownX, int mDownY, int mUpX, int mUpY) {
-        super.handleClick(viewGroup, clickableView, mDownX, mDownY, mUpX, mUpY);
         final String clickUrl = adDataRef.metaGroup.get(0).clickUrl;
         String strUrl = adDataRef.metaGroup.get(0).strLinkUrl;
         String url = strUrl == null ? clickUrl : strUrl;
@@ -282,6 +276,20 @@ public class ADMetaDataOfYdt extends ADMetaData {
             return;
         }
         doGet(Utils.getContext(), mUrl);
+    }
+
+    @Override
+    public void setClickPosition(int mDownX, int mDownY, int mUpX, int mUpY) {
+        super.setClickPosition(mDownX, mDownY, mUpX, mUpY);
+        this.mDownX = mDownX;
+        this.mDownY = mDownY;
+        this.mUpX = mUpX;
+        this.mUpY = mUpY;
+    }
+
+    @Override
+    public void setClickView(@NonNull ViewGroup viewGroup, @Nullable View clickableView) {
+        super.setClickView(viewGroup, clickableView);
     }
 
     private void doGet(@NonNull final Context mContext, String url) {
@@ -318,20 +326,21 @@ public class ADMetaDataOfYdt extends ADMetaData {
         AQuery aQuery = new AQuery(context);
         Toast.makeText(context, "开始下载" + getTitle(), Toast.LENGTH_SHORT).show();
         ydtUtils.anaStartDownload(ADMetaDataOfYdt.this, adClick.clickid);
-        aQuery.download(adClick.dstlink, new File(Environment.getExternalStorageDirectory().getPath() + "/download/"
-                + adClick.clickid + ".apk"), new AjaxCallback<File>() {
-            @Override
-            public void callback(String url, File object, AjaxStatus status) {
-                super.callback(url, object, status);
-                if (object != null && object.exists()) {
-                    ydtUtils.anaDownloadFinish(ADMetaDataOfYdt.this, adClick.clickid);
-                    ydtUtils.anaStartInstall(ADMetaDataOfYdt.this, adClick.clickid);
-                    InstallUtils.recordInstall(getPkgName(), getAnalysisInstalledUrls());
-                    AppUtils.installApk(context, object);
-                } else {
-                    Toast.makeText(context, "下载出错啦", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        aQuery.download(adClick.dstlink,
+                new File(Environment.getExternalStorageDirectory().getPath() + "/download/"
+                        + adClick.clickid + ".apk"), new AjaxCallback<File>() {
+                    @Override
+                    public void callback(String url, File object, AjaxStatus status) {
+                        super.callback(url, object, status);
+                        if (object != null && object.exists()) {
+                            ydtUtils.anaDownloadFinish(ADMetaDataOfYdt.this, adClick.clickid);
+                            ydtUtils.anaStartInstall(ADMetaDataOfYdt.this, adClick.clickid);
+                            InstallUtils.recordInstall(getPkgName(), getAnalysisInstalledUrls());
+                            AppUtils.installApk(context, object);
+                        } else {
+                            Toast.makeText(context, "下载出错啦", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }

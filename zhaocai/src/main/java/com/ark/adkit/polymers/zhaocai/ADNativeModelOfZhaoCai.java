@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.ark.adkit.basics.configs.ADOnlineConfig;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.zhaocai.ad.sdk.*;
@@ -36,7 +38,8 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
     };
     private WeakReference<Context> contextRef;
 
-    private AdConfiguration getAdConfiguration(Context context, @NonNull ADOnlineConfig adOnlineConfig, int size) {
+    private AdConfiguration getAdConfiguration(Context context,
+            @NonNull ADOnlineConfig adOnlineConfig, int size) {
         if (adConfiguration == null) {
             ZhaoCaiSDK.INSTANCE.setAppId(context, adOnlineConfig.appKey);
         }
@@ -63,7 +66,8 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
                 //上下文切换后重新初始化
                 if (lastContext == null || lastContext != context) {
                     LogUtils.i("wskj上下文变化,重新初始化");
-                    mNativeAD = new ZhaoCaiFeed(context, getAdConfiguration(context, mConfig, count));
+                    mNativeAD = new ZhaoCaiFeed(context,
+                            getAdConfiguration(context, mConfig, count));
                     mNativeAD.addListener(mListener);
                 }
             }
@@ -83,7 +87,7 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
 
     @Nullable
     @Override
-    public Object getData(@Nullable Context context) {
+    public Object getData(@Nullable final Context context) {
         Lock lock = new ReentrantLock();
         lock.lock();
         if (context == null) {
@@ -91,8 +95,13 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
             return null;
         }
         Object object = linkedQueue.poll();
-        if (!isFast() && linkedQueue.size() < 3) {
-            loadData(context, 3);
+        if (!isFast() && linkedQueue.peek() == null) {
+            Run.onUiAsync(new Action() {
+                @Override
+                public void call() {
+                    loadData(context, 3);
+                }
+            });
         }
         return object;
     }

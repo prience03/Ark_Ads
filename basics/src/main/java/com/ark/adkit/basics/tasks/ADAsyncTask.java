@@ -3,8 +3,10 @@ package com.ark.adkit.basics.tasks;
 import android.os.AsyncTask;
 import android.os.Build;
 
+@Deprecated
 public class ADAsyncTask<Params, Progress, Result> extends
         AsyncTask<Params, Progress, Result> implements IPublishProgress<Progress> {
+
     private IPreExecute mPreExecute;
     private IProgressUpdate<Progress> mProgressUpdate;
     private IDoInBackground<Params, Progress, Result> mDoInBackground;
@@ -14,17 +16,25 @@ public class ADAsyncTask<Params, Progress, Result> extends
     private ADAsyncTask() {
     }
 
+    public static <Params, Progress, Result> Builder<Params, Progress, Result> newBuilder() {
+        return new Builder<>();
+    }
+
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        if (mPreExecute != null) mPreExecute.onPreExecute();
+        if (mPreExecute != null) {
+            mPreExecute.onPreExecute();
+        }
     }
 
     @SafeVarargs
     @Override
     protected final void onProgressUpdate(Progress... values) {
         super.onProgressUpdate(values);
-        if (mProgressUpdate != null) mProgressUpdate.onProgressUpdate(values);
+        if (mProgressUpdate != null) {
+            mProgressUpdate.onProgressUpdate(values);
+        }
     }
 
     @Override
@@ -35,8 +45,9 @@ public class ADAsyncTask<Params, Progress, Result> extends
     @Override
     protected void onPostExecute(Result result) {
         super.onPostExecute(result);
-        if (mPostExecute != null && (mViewActive == null || mViewActive.isViewActive()))
+        if (mPostExecute != null && (mViewActive == null || mViewActive.isViewActive())) {
             mPostExecute.onPostExecute(result);
+        }
     }
 
     @SafeVarargs
@@ -48,14 +59,9 @@ public class ADAsyncTask<Params, Progress, Result> extends
         }
     }
 
-
     @Override
     public void showProgress(Progress[] values) {
         this.publishProgress(values);
-    }
-
-    public static <Params, Progress, Result> Builder<Params, Progress, Result> newBuilder() {
-        return new Builder<>();
     }
 
     public static class Builder<Params, Progress, Result> {
@@ -71,12 +77,14 @@ public class ADAsyncTask<Params, Progress, Result> extends
             return this;
         }
 
-        public Builder<Params, Progress, Result> setProgressUpdate(IProgressUpdate<Progress> progressUpdate) {
+        public Builder<Params, Progress, Result> setProgressUpdate(
+                IProgressUpdate<Progress> progressUpdate) {
             mAsyncTask.mProgressUpdate = progressUpdate;
             return this;
         }
 
-        public Builder<Params, Progress, Result> setDoInBackground(IDoInBackground<Params, Progress, Result> doInBackground) {
+        public Builder<Params, Progress, Result> setDoInBackground(
+                IDoInBackground<Params, Progress, Result> doInBackground) {
             mAsyncTask.mDoInBackground = doInBackground;
             return this;
         }

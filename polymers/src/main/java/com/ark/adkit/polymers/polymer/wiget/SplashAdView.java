@@ -14,10 +14,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.ark.adkit.basics.data.ADMetaData;
+import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 
 public class SplashAdView extends FrameLayout {
+
     private Context mContext;
     private ADMetaData mADData;
     private int mDownX, mDownY, mUpX, mUpY;
@@ -30,7 +32,7 @@ public class SplashAdView extends FrameLayout {
     }
 
     public SplashAdView(@NonNull Context context,
-                        @Nullable AttributeSet attrs) {
+            @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
@@ -41,7 +43,7 @@ public class SplashAdView extends FrameLayout {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public SplashAdView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr,
-                        int defStyleRes) {
+            int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initView(context);
     }
@@ -65,7 +67,7 @@ public class SplashAdView extends FrameLayout {
      */
     private void initView(Context context) {
         this.mContext = context;
-        inflate(context, R.layout.sdk_layout_splash_ad_view, this);
+        inflate(context, R.layout.sdk_widget_layout_splashadview, this);
         ivBg = (ImageView) findViewById(R.id.iv_bg);
         tvPlatform = (TextView) findViewById(R.id.ad_platform);
         //点击了广告
@@ -73,13 +75,18 @@ public class SplashAdView extends FrameLayout {
                 .setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        LogUtils.v(
+                                "onTouch:mDownX=" + mDownX + ",mDownY=" + mDownY + ",mUpX=" + mUpX
+                                        + ",mUpY=" + mUpY);
                         if (mADData != null) {
+                            mADData.setClickPosition(mDownX, mDownY, mUpX, mUpY);
+                            mADData.setClickView(SplashAdView.this, ivBg);
                             mADData.handleClick(SplashAdView.this);
-                            mADData.handleClick(SplashAdView.this, ivBg, mDownX, mDownY, mUpX, mUpY);
                         }
                         if (splashCallBack != null) {
                             splashCallBack.onAdClick(mADData != null &&
-                                    !TextUtils.isEmpty(mADData.getImgUrl()), mADData != null && mADData.isApp());
+                                            !TextUtils.isEmpty(mADData.getImgUrl()),
+                                    mADData != null && mADData.isApp());
                         }
                     }
                 });

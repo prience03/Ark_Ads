@@ -139,12 +139,6 @@ public class ADMetaDataOfIflytek extends ADMetaData {
         }
     }
 
-    @Override
-    public void handleClick(@NonNull ViewGroup viewGroup, @Nullable View clickableView,
-            int mDownX, int mDownY, int mUpX, int mUpY) {
-        super.handleClick(viewGroup, clickableView, mDownX, mDownY, mUpX, mUpY);
-    }
-
     @NonNull
     @Override
     public String getPlatform() {

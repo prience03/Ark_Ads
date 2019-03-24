@@ -10,24 +10,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        android:background="@android:color/white"
+        android:orientation="vertical"
         android:gravity="center"
-        android:orientation="vertical">
+        android:background="@android:color/white">
 
-        <com.xslczx.widget.RatioImageView
+        <ImageView
             android:id="@+id/ad_app_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleType="centerCrop"
-            app:riv_height_to_width_ratio="0.5625"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"/>
 
         <RelativeLayout
             android:id="@+id/rl_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="52dp"
             android:visibility="gone"
-            tools:visibility="visible">
+            tools:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="52dp">
 
             <com.xslczx.widget.ShapeImageView
                 android:id="@+id/ad_app_logo"
@@ -39,17 +37,17 @@
                 app:siv_round_radius="4dp"
                 app:siv_shape="rect"
                 tools:ignore="ContentDescription"
-                tools:src="@android:drawable/ic_btn_speak_now" />
+                tools:src="@android:drawable/ic_btn_speak_now"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_alignBottom="@+id/ad_app_logo"
+                android:layout_toRightOf="@+id/ad_app_logo"
+                android:layout_toEndOf="@+id/ad_app_logo"
                 android:layout_alignTop="@+id/ad_app_logo"
+                android:layout_alignBottom="@+id/ad_app_logo"
                 android:layout_marginLeft="5dp"
                 android:layout_marginStart="5dp"
-                android:layout_toEndOf="@+id/ad_app_logo"
-                android:layout_toRightOf="@+id/ad_app_logo"
                 android:orientation="vertical">
 
                 <TextView
@@ -57,24 +55,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
                     android:gravity="start|top"
+                    android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="@android:color/black"
                     android:textSize="14sp"
-                    tools:text="@android:string/cancel" />
+                    android:textColor="@android:color/black"
+                    tools:text="@android:string/cancel"/>
 
                 <TextView
                     android:id="@+id/ad_app_desc"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:ellipsize="end"
                     android:gravity="center_vertical"
+                    android:ellipsize="end"
                     android:maxLines="1"
-                    android:textColor="@android:color/black"
                     android:textSize="12sp"
-                    tools:text="@android:string/ok" />
+                    android:textColor="@android:color/black"
+                    tools:text="@android:string/ok"/>
             </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
@@ -84,24 +82,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="1dp"
-        android:background="@drawable/sdk_ad_tag_bg"
         android:gravity="center"
-        android:text="广告"
-        android:textColor="@android:color/white"
+        android:background="@drawable/sdk_ad_tag_bg"
         android:textSize="10sp"
-        tools:ignore="HardcodedText,SmallSp" />
+        tools:ignore="HardcodedText,SmallSp"
+        android:textColor="@android:color/white"
+        android:text="广告"/>
 
     <TextView
         android:id="@+id/ad_platform"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:padding="4dp"
         android:background="@drawable/sdk_ad_tag_bg_green"
-        android:textColor="@android:color/white"
         android:textSize="12sp"
-        android:visibility="gone"
         tools:ignore="SmallSp"
-        tools:text="wskj"
-        tools:visibility="visible" />
+        android:textColor="@android:color/white"
+        tools:text="wskj"/>
 </FrameLayout>

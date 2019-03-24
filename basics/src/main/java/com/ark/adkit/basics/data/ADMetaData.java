@@ -80,7 +80,10 @@ public abstract class ADMetaData {
 
     public abstract void handleClick(@NonNull ViewGroup viewGroup);
 
-    public void handleClick(@NonNull ViewGroup viewGroup, @Nullable View clickableView,
-                            int mDownX, int mDownY, int mUpX, int mUpY) {
+    public void setClickView(@NonNull ViewGroup viewGroup, @Nullable View clickableView) {
+    }
+
+    public void setClickPosition(int mDownX, int mDownY, int mUpX, int mUpY){
+
     }
 }

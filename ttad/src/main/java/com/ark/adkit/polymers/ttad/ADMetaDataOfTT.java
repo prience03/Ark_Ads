@@ -174,12 +174,6 @@ public class ADMetaDataOfTT extends ADMetaData {
         }
     }
 
-    @Override
-    public void handleClick(@NonNull ViewGroup viewGroup, @Nullable View clickableView,
-            int mDownX, int mDownY, int mUpX, int mUpY) {
-
-    }
-
     @NonNull
     @Override
     public String getPlatform() {

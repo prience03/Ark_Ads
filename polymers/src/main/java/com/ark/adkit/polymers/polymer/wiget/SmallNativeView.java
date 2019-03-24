@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.ark.adkit.basics.data.ADMetaData;
+import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.self.ADMetaDataOfSelf;
@@ -47,16 +48,13 @@ public class SmallNativeView extends FrameLayout {
         initView(context);
     }
 
-    /**
-     * 更新数据
-     *
-     * @param adMetas ADMetaData
-     */
-    public void setData(ADMetaData adMetas) {
+    public void attachViewGroup(ViewGroup viewGroup, ADMetaData adMetas) {
+        viewGroup.addView(this);
         this.mADData = adMetas;
-        if (mADData != null) {
-            updateUi(mADData);
-        }
+        LayoutParams layoutParams = new LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.height = (int) (getWidth() * 1.5);
+        imageView.setLayoutParams(layoutParams);
     }
 
     /**
@@ -66,15 +64,9 @@ public class SmallNativeView extends FrameLayout {
      */
     private void initView(Context context) {
         this.mContext = context;
-        inflate(context, R.layout.sdk_item_ad_ratio_wrap_width, this);
-        imageView = (ImageView) findViewById(R.id.ad_app_image);
-        tvPlatform = (TextView) findViewById(R.id.ad_platform);
-        setOnGenericMotionListener(new OnGenericMotionListener() {
-            @Override
-            public boolean onGenericMotion(View v, MotionEvent event) {
-                return false;
-            }
-        });
+        inflate(context, R.layout.sdk_widget_layout_smalladview, this);
+        imageView = findViewById(R.id.ad_app_image);
+        tvPlatform = findViewById(R.id.ad_platform);
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -87,10 +79,13 @@ public class SmallNativeView extends FrameLayout {
                         mUpX = (int) event.getX();
                         mUpY = (int) event.getY();
                         v.performClick();
+                        LogUtils.v(
+                                "onTouch:mDownX=" + mDownX + ",mDownY=" + mDownY + ",mUpX=" + mUpX
+                                        + ",mUpY=" + mUpY);
                         if (mADData != null) {
+                            mADData.setClickPosition(mDownX, mDownY, mUpX, mUpY);
+                            mADData.setClickView(SmallNativeView.this, imageView);
                             mADData.handleClick(SmallNativeView.this);
-                            mADData.handleClick(SmallNativeView.this, imageView, mDownX, mDownY,
-                                    mUpX, mUpY);
                         }
                         break;
                 }
@@ -105,10 +100,6 @@ public class SmallNativeView extends FrameLayout {
      * @param metaData ADMetaData
      */
     private void updateUi(@NonNull ADMetaData metaData) {
-        LayoutParams layoutParams = new LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.height = (int) (getWidth() * 1.5);
-        imageView.setLayoutParams(layoutParams);
         String url = metaData.getImgUrl();
         if (metaData instanceof ADMetaDataOfSelf) {
             url = ((ADMetaDataOfSelf) metaData).getVerticalImage();

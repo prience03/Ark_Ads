@@ -67,8 +67,7 @@ public abstract class ADNativeModel {
         for (Object o : list) {
             linkedQueue.offer(o);
         }
-        LogUtils.w(platform + "请求广告成功,获取了" + list.size() + "条" + "共" + linkedQueue
-                .size());
+        LogUtils.w(platform + "请求广告成功,获取了" + list.size() + "条");
     }
 
     public void handleFailure(@NonNull String platform, int code, @Nullable String msg) {

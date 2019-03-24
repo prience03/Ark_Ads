@@ -9,6 +9,8 @@ import com.ark.adkit.basics.configs.ADOnlineConfig;
 import com.ark.adkit.basics.configs.ADStyle;
 import com.ark.adkit.basics.configs.Strategy;
 import com.ark.adkit.basics.data.ADMetaData;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.models.OnNativeListener;
 import com.ark.adkit.basics.utils.LogUtils;
@@ -114,18 +116,14 @@ public abstract class NativeWrapper {
         int strategy = ADTool.getADTool().getStrategy();
         if (strategy == Strategy.shuffle) {
             Collections.shuffle(sort);
-            LogUtils.i("随机顺序" + sort);
         } else if (strategy == Strategy.cycle) {
             if (ADTool.index-- <= Integer.MIN_VALUE) {
                 ADTool.index = 0;
             }
             Collections.rotate(sort, ADTool.index);
-            LogUtils.i("位移顺序" + sort);
-        } else if (strategy == Strategy.order) {
-            LogUtils.i("默认顺序" + sort);
         }
-        for (int i = 0; i < sort.size(); i++) {
-            String platform = sort.get(i);
+        LogUtils.v("sort:" + sort);
+        for (String platform : sort) {
             ADOnlineConfig adOnlineConfig = getConfig(mADConfig, adStyle, platform);
             metaData = getSingleNative(context, adStyle, platform, adOnlineConfig);
             if (metaData != null) {
@@ -167,33 +165,43 @@ public abstract class NativeWrapper {
 
     public <T> void load(@NonNull final Context context,
             @NonNull final ViewGroup viewGroup, final int type,
-            OnNativeListener<T> onNativeListener) {
-        ADMetaData nativeAD;
-        if (type == AD_VIDEO) {
-            nativeAD = getVideoNative(context);
-        } else if (type == AD_BANNER) {
-            nativeAD = getDetailNative(context);
-        } else {
-            nativeAD = getListNative(context);
-        }
-        switch (type) {
-            case AD_COMMON:
-                loadNativeView(context, viewGroup, nativeAD,
-                        (OnNativeListener<ADMetaData>) onNativeListener);
-                break;
-            case AD_SMALL:
-                loadSmallNativeView(context, viewGroup, nativeAD,
-                        (OnNativeListener<ADMetaData>) onNativeListener);
-                break;
-            case AD_BANNER:
-                loadBannerView(context, viewGroup, nativeAD,
-                        (OnNativeListener<ADMetaData>) onNativeListener);
-                break;
-            case AD_VIDEO:
-                loadVideoView(context, viewGroup, nativeAD,
-                        (OnNativeListener<ADMetaData>) onNativeListener);
-                break;
-        }
+            final OnNativeListener<T> onNativeListener) {
+        Run.onBackground(new Action() {
+            @Override
+            public void call() {
+            final ADMetaData nativeAD;
+                if (type == AD_VIDEO) {
+                    nativeAD = getVideoNative(context);
+                } else if (type == AD_BANNER) {
+                    nativeAD = getDetailNative(context);
+                } else {
+                    nativeAD = getListNative(context);
+                }
+                Run.onUiSync(new Action() {
+                    @Override
+                    public void call() {
+                        switch (type) {
+                            case AD_COMMON:
+                                loadNativeView(context, viewGroup, nativeAD,
+                                        (OnNativeListener<ADMetaData>) onNativeListener);
+                                break;
+                            case AD_SMALL:
+                                loadSmallNativeView(context, viewGroup, nativeAD,
+                                        (OnNativeListener<ADMetaData>) onNativeListener);
+                                break;
+                            case AD_BANNER:
+                                loadBannerView(context, viewGroup, nativeAD,
+                                        (OnNativeListener<ADMetaData>) onNativeListener);
+                                break;
+                            case AD_VIDEO:
+                                loadVideoView(context, viewGroup, nativeAD,
+                                        (OnNativeListener<ADMetaData>) onNativeListener);
+                                break;
+                        }
+                    }
+                });
+            }
+        });
     }
 
     public abstract void loadVideoView(Context context, ViewGroup viewGroup, ADMetaData videoData,

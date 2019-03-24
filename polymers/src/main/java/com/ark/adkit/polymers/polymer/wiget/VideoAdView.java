@@ -4,10 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.ark.adkit.basics.data.ADMetaData;
+import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.ydt.utils.ScreenUtils;
@@ -28,6 +29,7 @@ public class VideoAdView extends FrameLayout {
     private View rlBottom;
     private ADMetaData mVideoData;
     private Context mContext;
+    private int mDownX, mDownY, mUpX, mUpY;
 
     public VideoAdView(Context context) {
         this(context, null);
@@ -49,16 +51,14 @@ public class VideoAdView extends FrameLayout {
         initView(context);
     }
 
-    /**
-     * 更新数据
-     *
-     * @param videoData ADMetaData
-     */
-    public void setData(ADMetaData videoData) {
-        this.mVideoData = videoData;
-        if (mVideoData != null) {
-            updateUi(mVideoData);
-        }
+    public void attachViewGroup(ViewGroup viewGroup, ADMetaData adMetas) {
+        viewGroup.addView(this);
+        this.mVideoData = adMetas;
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.width = ScreenUtils.getScreenWidth(mContext);
+        layoutParams.height = (int) (ScreenUtils.getScreenWidth(mContext) * 0.5625);
+        videoView.setLayoutParams(layoutParams);
     }
 
     /**
@@ -68,7 +68,7 @@ public class VideoAdView extends FrameLayout {
      */
     private void initView(Context context) {
         this.mContext = context;
-        inflate(context, R.layout.sdk_item_ad_ratio_match_width_video, this);
+        inflate(context, R.layout.sdk_widget_layout_videoadview, this);
         videoView = findViewById(R.id.ad_app_video);
         logoView = findViewById(R.id.ad_app_logo);
         adTitleView = findViewById(R.id.ad_app_title);
@@ -83,49 +83,62 @@ public class VideoAdView extends FrameLayout {
                 }
             }
         });
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.width = ScreenUtils.getScreenWidth(mContext);
-        layoutParams.height = (int) (ScreenUtils.getScreenWidth(mContext) * 0.5625);
-        videoView.setLayoutParams(layoutParams);
+        setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        mDownX = (int) event.getX();
+                        mDownY = (int) event.getY();
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        mUpX = (int) event.getX();
+                        mUpY = (int) event.getY();
+                        v.performClick();
+                        LogUtils.v(
+                                "onTouch:mDownX=" + mDownX + ",mDownY=" + mDownY + ",mUpX=" + mUpX
+                                        + ",mUpY=" + mUpY);
+                        /*if (mVideoData != null) {
+                            mVideoData.setClickPosition(mDownX, mDownY, mUpX, mUpY);
+                            mVideoData.setClickView(VideoAdView.this, v);
+                            mVideoData.handleClick(VideoAdView.this);
+                        }*/
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
-    public void refreshVideoView() {
-        if (mVideoData != null && mVideoData.getAdView() != null) {
-            videoView.removeAllViews();
+    public void handleView() {
+        if (mVideoData == null) {
+            return;
+        }
+        if (mVideoData.getAdView() != null) {
             videoView.addView(mVideoData.getAdView());
-            mVideoData.handleView(videoView);
         }
-    }
-
-    /**
-     * 更新布局
-     *
-     * @param videoData ADMetaData
-     */
-    private void updateUi(@NonNull ADMetaData videoData) {
         //如果logo不存在就用图片代替
-        if (!TextUtils.isEmpty(videoData.getLogoUrl())) {
-            ADTool.getADTool().getManager().loadImage(logoView, videoData.getLogoUrl());
-        } else if (!TextUtils.isEmpty(videoData.getImgUrl())) {
-            ADTool.getADTool().getManager().loadImage(logoView, videoData.getImgUrl());
+        if (!TextUtils.isEmpty(mVideoData.getLogoUrl())) {
+            ADTool.getADTool().getManager().loadImage(logoView, mVideoData.getLogoUrl());
+        } else if (!TextUtils.isEmpty(mVideoData.getImgUrl())) {
+            ADTool.getADTool().getManager().loadImage(logoView, mVideoData.getImgUrl());
         }
-        String title = videoData.getTitle();
-        String subTitle = videoData.getSubTitle();
+        String title = mVideoData.getTitle();
+        String subTitle = mVideoData.getSubTitle();
         //没有标题的话不显示底部
         if (!TextUtils.isEmpty(title)) {
             adTitleView.setText(title);
             rlBottom.setVisibility(VISIBLE);
         }
         if (!TextUtils.isEmpty(subTitle)) {
-            adSubTitleView.setText(videoData.getSubTitle());
+            adSubTitleView.setText(mVideoData.getSubTitle());
         }
         if (ADTool.getADTool().isDebugMode()) {
             tvPlatform.setVisibility(VISIBLE);
-            tvPlatform.setText(videoData.getPlatform());
+            tvPlatform.setText(mVideoData.getPlatform());
         }
         if (mContext instanceof Activity) {
-            Object o = videoData.getData();
+            Object o = mVideoData.getData();
             try {
                 if (o instanceof TTFeedAd) {
                     ((TTFeedAd) o).setActivityForDownloadApp((Activity) mContext);
@@ -134,5 +147,6 @@ public class VideoAdView extends FrameLayout {
                 e.printStackTrace();
             }
         }
+        mVideoData.handleView(videoView);
     }
 }

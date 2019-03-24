@@ -26,7 +26,7 @@ public class App extends Application {
         ADTool.initialize(new ADTool.Builder()
                 .setDebugMode(true)
                 .setStrategy(Strategy.cycle)
-                .setLoadOtherWhenVideoDisable(false)
+                .setLoadOtherWhenVideoDisable(true)
                 .setLocalConfig(JsonUtils.getJson(this, "config.json"))
                 .build());
     }

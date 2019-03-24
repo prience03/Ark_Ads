@@ -41,6 +41,12 @@
             android:onClick="cycle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+    <Button
+            android:text="列表"
+            android:textAllCaps="false"
+            android:onClick="list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     <TextView
             android:id="@+id/text"

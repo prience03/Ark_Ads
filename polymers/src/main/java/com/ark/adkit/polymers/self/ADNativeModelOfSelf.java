@@ -3,6 +3,8 @@ package com.ark.adkit.polymers.self;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.utils.LogUtils;
 
@@ -56,8 +58,13 @@ public class ADNativeModelOfSelf extends ADNativeModel {
             return null;
         }
         Object object = linkedQueue.poll();
-        if (!isFast() && linkedQueue.isEmpty()) {
-            loadData(context, 1);
+        if (!isFast() && linkedQueue.peek() == null) {
+            Run.onUiAsync(new Action() {
+                @Override
+                public void call() {
+                    loadData(context, 1);
+                }
+            });
         }
         return object;
     }

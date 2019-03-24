@@ -3,11 +3,21 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <compositeConfiguration>
-          <compositeBuild compositeDefinitionSource="SCRIPT" />
-        </compositeConfiguration>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/basics" />
+            <option value="$PROJECT_DIR$/gdt" />
+            <option value="$PROJECT_DIR$/iflytek" />
+            <option value="$PROJECT_DIR$/longyun" />
+            <option value="$PROJECT_DIR$/polymers" />
+            <option value="$PROJECT_DIR$/ttad" />
+            <option value="$PROJECT_DIR$/zhaocai" />
+          </set>
+        </option>
         <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>

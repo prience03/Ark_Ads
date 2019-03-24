@@ -11,7 +11,10 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.ark.adkit.basics.configs.ADPlatform;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.OnSplashImpl;
+import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.polymer.interrcmd.RecommendDialog;
 import com.ark.adkit.polymers.self.SelfADStyle;
@@ -24,6 +27,7 @@ import com.ark.utils.permissions.PermissionItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class MainActivity extends AppCompatActivity implements SplashFragment.OnPreparedListener {
 
@@ -163,31 +167,58 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
     }
 
     public void rotate(View view) {
-        mStringList.clear();
-        mStringList.add("1:"+ADPlatform.GDT);
-        mStringList.add("2:"+ADPlatform.IFLY);
-        mStringList.add("3:"+ADPlatform.LYJH);
-        mStringList.add("4:"+ADPlatform.SELF);
-        mStringList.add("5:"+ADPlatform.TTAD);
-        mStringList.add("6:"+ADPlatform.WSKJ);
-        mStringList.add("7:"+ADPlatform.YDT);
-        if (mIndex-- <= Integer.MIN_VALUE) {
-            mIndex = 0;
-        }
-        Collections.rotate(mStringList, mIndex);
-        mTextView.setText(mStringList.toString());
+        Run.onBackground(new Action() {
+            @Override
+            public void call() {
+                LogUtils.e("call thread:"+Thread.currentThread().getName());
+                mStringList.clear();
+                mStringList.add("1:" + ADPlatform.GDT);
+                mStringList.add("2:" + ADPlatform.IFLY);
+                mStringList.add("3:" + ADPlatform.LYJH);
+                mStringList.add("4:" + ADPlatform.SELF);
+                mStringList.add("5:" + ADPlatform.TTAD);
+                mStringList.add("6:" + ADPlatform.WSKJ);
+                mStringList.add("7:" + ADPlatform.YDT);
+                if (mIndex-- <= Integer.MIN_VALUE) {
+                    mIndex = 0;
+                }
+                Collections.rotate(mStringList, mIndex);
+                Run.onUiAsync(new Action() {
+                    @Override
+                    public void call() {
+                        LogUtils.e("ui thread:"+Thread.currentThread().getName());
+                        mTextView.setText(mStringList.toString());
+                    }
+                });
+            }
+        });
     }
 
     public void cycle(View view) {
-        mStringList.clear();
-        mStringList.add("1:"+ADPlatform.GDT);
-        mStringList.add("2:"+ADPlatform.IFLY);
-        mStringList.add("3:"+ADPlatform.LYJH);
-        mStringList.add("4:"+ADPlatform.SELF);
-        mStringList.add("5:"+ADPlatform.TTAD);
-        mStringList.add("6:"+ADPlatform.WSKJ);
-        mStringList.add("7:"+ADPlatform.YDT);
-        Collections.shuffle(mStringList);
-        mTextView.setText(mStringList.toString());
+        Run.onBackground(new Action() {
+            @Override
+            public void call() {
+                mStringList.clear();
+                mStringList.add("1:" + ADPlatform.GDT);
+                mStringList.add("2:" + ADPlatform.IFLY);
+                mStringList.add("3:" + ADPlatform.LYJH);
+                mStringList.add("4:" + ADPlatform.SELF);
+                mStringList.add("5:" + ADPlatform.TTAD);
+                mStringList.add("6:" + ADPlatform.WSKJ);
+                mStringList.add("7:" + ADPlatform.YDT);
+                Collections.shuffle(mStringList);
+                Run.onUiAsync(new Action() {
+                    @Override
+                    public void call() {
+                        mTextView.setText(mStringList.toString());
+                    }
+                });
+            }
+        });
+    }
+
+    public void list(View view) {
+        ListAdFragment listAdFragment = new ListAdFragment();
+        listAdFragment.show(getSupportFragmentManager(), "list");
     }
 }

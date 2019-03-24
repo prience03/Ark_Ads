@@ -3,17 +3,18 @@ package com.ark.adkit.polymers.polymer.wiget;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.androidquery.AQuery;
 import com.ark.adkit.basics.data.ADMetaData;
+import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 
@@ -40,21 +41,14 @@ public class BannerAdView extends FrameLayout {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public BannerAdView(Context context, @Nullable AttributeSet attrs, int defStyleAttr,
-                        int defStyleRes) {
+            int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initView(context);
     }
 
-    /**
-     * 更新数据
-     *
-     * @param adMetas AdMetas
-     */
-    public void setData(ADMetaData adMetas) {
+    public void attachViewGroup(ViewGroup viewGroup, ADMetaData adMetas) {
+        viewGroup.addView(this);
         this.adMetaData = adMetas;
-        if (adMetaData != null) {
-            updateUi(adMetaData);
-        }
     }
 
     /**
@@ -64,12 +58,12 @@ public class BannerAdView extends FrameLayout {
      */
     private void initView(Context context) {
         this.mContext = context;
-        inflate(context, R.layout.sdk_item_ad_banner_match_width, this);
-        logoView = (ImageView) findViewById(R.id.ad_app_logo);
-        adTitleView = (TextView) findViewById(R.id.ad_app_title);
-        adAppDownload = (TextView) findViewById(R.id.ad_app_download);
-        adSubTitleView = (TextView) findViewById(R.id.ad_app_desc);
-        tvPlatform = (TextView) findViewById(R.id.ad_platform);
+        inflate(context, R.layout.sdk_widget_layout_banneradview, this);
+        logoView = findViewById(R.id.ad_app_logo);
+        adTitleView = findViewById(R.id.ad_app_title);
+        adAppDownload = findViewById(R.id.ad_app_download);
+        adSubTitleView = findViewById(R.id.ad_app_desc);
+        tvPlatform = findViewById(R.id.ad_platform);
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -82,9 +76,13 @@ public class BannerAdView extends FrameLayout {
                         mUpX = (int) event.getX();
                         mUpY = (int) event.getY();
                         v.performClick();
+                        LogUtils.v(
+                                "onTouch:mDownX=" + mDownX + ",mDownY=" + mDownY + ",mUpX=" + mUpX
+                                        + ",mUpY=" + mUpY);
                         if (adMetaData != null) {
+                            adMetaData.setClickPosition(mDownX, mDownY, mUpX, mUpY);
+                            adMetaData.setClickView(BannerAdView.this, adAppDownload);
                             adMetaData.handleClick(BannerAdView.this);
-                            adMetaData.handleClick(BannerAdView.this, adAppDownload, mDownX, mDownY, mUpX, mUpY);
                         }
                         break;
                 }
@@ -95,30 +93,31 @@ public class BannerAdView extends FrameLayout {
 
     /**
      * 更新布局
-     *
-     * @param metaData ADMetaData
      */
-    private void updateUi(@NonNull ADMetaData metaData) {
+    public void handleView() {
+        if (adMetaData == null) {
+            return;
+        }
         //如果logo不存在就用图片代替
         AQuery aQuery = new AQuery(logoView);
-        if (!TextUtils.isEmpty(metaData.getLogoUrl())) {
-            aQuery.image(metaData.getLogoUrl(), true, true);
-        } else if (!TextUtils.isEmpty(metaData.getImgUrl())) {
-            aQuery.image(metaData.getImgUrl(), true, true);
+        if (!TextUtils.isEmpty(adMetaData.getLogoUrl())) {
+            aQuery.image(adMetaData.getLogoUrl(), true, true);
+        } else if (!TextUtils.isEmpty(adMetaData.getImgUrl())) {
+            aQuery.image(adMetaData.getImgUrl(), true, true);
         }
-        String title = metaData.getTitle();
-        String subTitle = metaData.getSubTitle();
+        String title = adMetaData.getTitle();
+        String subTitle = adMetaData.getSubTitle();
         if (!TextUtils.isEmpty(title)) {
             adTitleView.setText(title);
         }
         if (!TextUtils.isEmpty(subTitle)) {
-            adSubTitleView.setText(metaData.getSubTitle());
+            adSubTitleView.setText(adMetaData.getSubTitle());
         }
-        adAppDownload.setText(metaData.isApp() ? "下载" : "浏览");
+        adAppDownload.setText(adMetaData.isApp() ? "下载" : "浏览");
         if (ADTool.getADTool().isDebugMode()) {
             tvPlatform.setVisibility(VISIBLE);
-            tvPlatform.setText(metaData.getPlatform());
+            tvPlatform.setText(adMetaData.getPlatform());
         }
-        metaData.handleView(this);
+        adMetaData.handleView(this);
     }
 }

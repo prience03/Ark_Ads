@@ -41,7 +41,7 @@ dependencies {
     compileOnly project(':longyun')
     compileOnly project(':zhaocai')
     compileOnly project(':gdt')
-    api 'com.ark.ads:basics:1.0.0'
+    compileOnly project (':basics')
     api 'com.ark.ads:imageview:1.0.0'
     api 'com.ark.custom:permissions:1.0.0'
     api 'com.ark.custom:kvalue:1.0.0'
@@ -62,27 +62,10 @@ uploadArchives {
             }
             pom.groupId = 'com.ark.ads'
             pom.artifactId = 'core'
-            pom.version = '1.0.0'
+            pom.version = '1.0.1'
             pom.packaging = 'aar'
         }
     }
 }
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.sourceFiles
-}
-task androidJavadocsJar(type: Jar) {
-    classifier = 'javadoc'
-    from androidJavadocs.destinationDir
-}
-task androidSourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
-}
-artifacts {
-    archives androidSourcesJar
-    archives androidJavadocsJar
-}
-uploadArchives.mustRunAfter('build')
-uploadArchives << {
-    println "Uploaded success"
-}
+apply from: '../upload_task.gradle'
+

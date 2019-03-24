@@ -14,8 +14,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.androidquery.AQuery;
 import com.ark.adkit.basics.data.ADMetaData;
+import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.ydt.utils.ScreenUtils;
@@ -45,21 +45,20 @@ public class NativeAdView extends FrameLayout {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public NativeAdView(Context context, @Nullable AttributeSet attrs, int defStyleAttr,
-                        int defStyleRes) {
+            int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initView(context);
     }
 
-    /**
-     * 更新数据
-     *
-     * @param adMetas ADMetaData
-     */
-    public void setData(ADMetaData adMetas) {
+    public void attachViewGroup(ViewGroup viewGroup,ADMetaData adMetas) {
+        viewGroup.addView(this);
         this.adMetaData = adMetas;
-        if (adMetaData != null) {
-            updateUi(adMetaData);
-        }
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.width = ScreenUtils.getScreenWidth(mContext);
+        layoutParams.height = (int) (ScreenUtils.getScreenWidth(mContext) * 0.5625);
+        imageView.setLayoutParams(layoutParams);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
     }
 
     /**
@@ -69,19 +68,13 @@ public class NativeAdView extends FrameLayout {
      */
     private void initView(Context context) {
         this.mContext = context;
-        inflate(context, R.layout.sdk_item_ad_ratio_match_width, this);
+        inflate(context, R.layout.sdk_widget_layout_nativeadview, this);
         imageView = findViewById(R.id.ad_app_image);
         logoView = findViewById(R.id.ad_app_logo);
         adTitleView = findViewById(R.id.ad_app_title);
         adSubTitleView = findViewById(R.id.ad_app_desc);
         rlBottom = findViewById(R.id.rl_bottom);
         tvPlatform = findViewById(R.id.ad_platform);
-        setOnGenericMotionListener(new OnGenericMotionListener() {
-            @Override
-            public boolean onGenericMotion(View v, MotionEvent event) {
-                return false;
-            }
-        });
         setOnTouchListener(new OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -94,9 +87,13 @@ public class NativeAdView extends FrameLayout {
                         mUpX = (int) event.getX();
                         mUpY = (int) event.getY();
                         v.performClick();
+                        LogUtils.v(
+                                "onTouch:mDownX=" + mDownX + ",mDownY=" + mDownY + ",mUpX=" + mUpX
+                                        + ",mUpY=" + mUpY);
                         if (adMetaData != null) {
+                            adMetaData.setClickPosition(mDownX, mDownY, mUpX, mUpY);
+                            adMetaData.setClickView(NativeAdView.this, imageView);
                             adMetaData.handleClick(NativeAdView.this);
-                            adMetaData.handleClick(NativeAdView.this, imageView, mDownX, mDownY, mUpX, mUpY);
                         }
                         break;
                 }
@@ -108,37 +105,31 @@ public class NativeAdView extends FrameLayout {
     /**
      * 更新布局
      *
-     * @param metaData ADMetaData
      */
-    private void updateUi(@NonNull ADMetaData metaData) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.width = ScreenUtils.getScreenWidth(mContext);
-        layoutParams.height = (int) (ScreenUtils.getScreenWidth(mContext) * 0.5625);
-        imageView.setLayoutParams(layoutParams);
-        if (!TextUtils.isEmpty(metaData.getImgUrl())) {
-            new AQuery(imageView).image(metaData.getImgUrl(), true, true);
+    public void handleView() {
+        if (!TextUtils.isEmpty(adMetaData.getImgUrl())) {
+            ADTool.getADTool().getManager().loadImage(imageView,adMetaData.getImgUrl());
         }
         //如果logo不存在就用图片代替
-        if (!TextUtils.isEmpty(metaData.getLogoUrl())) {
-            new AQuery(logoView).image(metaData.getLogoUrl(), true, true);
-        } else if (!TextUtils.isEmpty(metaData.getImgUrl())) {
-            new AQuery(logoView).image(metaData.getImgUrl(), true, true);
+        if (!TextUtils.isEmpty(adMetaData.getLogoUrl())) {
+            ADTool.getADTool().getManager().loadImage(logoView,adMetaData.getLogoUrl());
+        } else if (!TextUtils.isEmpty(adMetaData.getImgUrl())) {
+            ADTool.getADTool().getManager().loadImage(logoView,adMetaData.getImgUrl());
         }
-        String title = metaData.getTitle();
-        String subTitle = metaData.getSubTitle();
+        String title = adMetaData.getTitle();
+        String subTitle = adMetaData.getSubTitle();
         //没有标题的话不显示底部
         if (!TextUtils.isEmpty(title)) {
             adTitleView.setText(title);
             rlBottom.setVisibility(VISIBLE);
         }
         if (!TextUtils.isEmpty(subTitle)) {
-            adSubTitleView.setText(metaData.getSubTitle());
+            adSubTitleView.setText(adMetaData.getSubTitle());
         }
         if (ADTool.getADTool().isDebugMode()) {
             tvPlatform.setVisibility(VISIBLE);
-            tvPlatform.setText(metaData.getPlatform());
+            tvPlatform.setText(adMetaData.getPlatform());
         }
-        metaData.handleView(this);
+        adMetaData.handleView(this);
     }
 }

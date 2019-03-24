@@ -105,13 +105,13 @@ public class ADMetaDataOfZhaoCai extends ADMetaData {
                                 new ZhaoCaiNativeInteractionListener() {
                                     @Override
                                     public void onAdClicked(View view,
-                                                            ZhaoCaiNative zhaoCaiNative) {
+                                            ZhaoCaiNative zhaoCaiNative) {
                                         LogUtils.i("wskj click" + zhaoCaiNative.getTitle());
                                     }
 
                                     @Override
                                     public void onAdCreativeClick(View view,
-                                                                  ZhaoCaiNative zhaoCaiNative) {
+                                            ZhaoCaiNative zhaoCaiNative) {
 
                                     }
 
@@ -126,12 +126,6 @@ public class ADMetaDataOfZhaoCai extends ADMetaData {
 
     @Override
     public void handleClick(@NonNull ViewGroup viewGroup) {
-
-    }
-
-    @Override
-    public void handleClick(@NonNull ViewGroup viewGroup, @Nullable View clickableView,
-                            int mDownX, int mDownY, int mUpX, int mUpY) {
 
     }
 

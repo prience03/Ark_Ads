@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.ark.adkit.basics.configs.ADOnlineConfig;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.ttad.config.TTAdManagerHolder;
@@ -11,7 +13,6 @@ import com.bytedance.sdk.openadsdk.AdSlot;
 import com.bytedance.sdk.openadsdk.TTAdNative;
 import com.bytedance.sdk.openadsdk.TTFeedAd;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class ADNativeModelOfTT extends ADNativeModel {
@@ -71,14 +72,19 @@ public class ADNativeModelOfTT extends ADNativeModel {
 
     @Nullable
     @Override
-    public Object getData(@Nullable Context context) {
+    public Object getData(@Nullable final Context context) {
         if (context == null) {
             LogUtils.e("取出广告被终止,当前上下文已被销毁");
             return null;
         }
         Object object = linkedQueue.poll();
-        if (!isFast() && linkedQueue.size() < 3) {
-            loadData(context, linkedQueue.isEmpty() ? 3 : 1);
+        if (!isFast() && linkedQueue.peek() == null) {
+            Run.onUiAsync(new Action() {
+                @Override
+                public void call() {
+                    loadData(context, 3);
+                }
+            });
         }
         return object;
     }

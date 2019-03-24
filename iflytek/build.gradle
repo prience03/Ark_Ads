@@ -35,7 +35,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     api files('libs/Ad_Android_SDK.jar')
-    api 'com.ark.ads:basics:1.0.0'
+    compileOnly project (':basics')
     compileOnly files('libs/android-query-full.0.26.7.jar')
 }
 
@@ -53,27 +53,9 @@ uploadArchives {
             }
             pom.groupId = 'com.ark.ads'
             pom.artifactId = 'iflytek'
-            pom.version = '1.0.0'
+            pom.version = '1.0.1'
             pom.packaging = 'aar'
         }
     }
 }
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.sourceFiles
-}
-task androidJavadocsJar(type: Jar) {
-    classifier = 'javadoc'
-    from androidJavadocs.destinationDir
-}
-task androidSourcesJar(type: Jar) {
-    classifier = 'sources'
-    from android.sourceSets.main.java.sourceFiles
-}
-artifacts {
-    archives androidSourcesJar
-    archives androidJavadocsJar
-}
-uploadArchives.mustRunAfter('build')
-uploadArchives << {
-    println "Uploaded success"
-}
+apply from: '../upload_task.gradle'
