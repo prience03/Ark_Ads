@@ -1,6 +1,7 @@
 package com.ark.adkit.polymers.self;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -61,7 +62,7 @@ public class ADMetaDataOfSelf extends ADMetaData {
                 : mSelfDataRef.getAppImage();
     }
 
-    public String getVerticalImage(){
+    public String getVerticalImage() {
         return mStyle == SelfADStyle.SPLASH ? mSelfDataRef.getSplashImage()
                 : mSelfDataRef.getVerticalImage();
     }
@@ -95,6 +96,15 @@ public class ADMetaDataOfSelf extends ADMetaData {
         String url = mSelfDataRef.getTargetUrl();
         final Context context = viewGroup.getContext();
         if (isApp()) {
+            if (AppUtils.checkApkExist(context, getPkgName())) {
+                Intent intent = context.getPackageManager().getLaunchIntentForPackage(getPkgName());
+                try {
+                    context.startActivity(intent);
+                    return;
+                } catch (Exception e) {
+                    //
+                }
+            }
             File dir = FileUtils.getFileDir(context, "download");
             AQuery aQuery = new AQuery(context);
             Toast.makeText(context, "正在下载" + mSelfDataRef.getAppTitle(),

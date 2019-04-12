@@ -53,7 +53,7 @@ uploadArchives {
             }
             pom.groupId = 'com.ark.ads'
             pom.artifactId = 'iflytek'
-            pom.version = '1.0.1'
+            pom.version = '1.1.0'
             pom.packaging = 'aar'
         }
     }

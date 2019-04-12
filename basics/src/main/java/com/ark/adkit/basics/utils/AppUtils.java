@@ -173,10 +173,9 @@ public class AppUtils {
         }
     }
 
-
     public static void installApk(Context context, File appFile) {
-        if (isTargetOver(context, Build.VERSION_CODES.O)
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (isTargetOver(context, 26)
+                && Build.VERSION.SDK_INT >= 26) {
             boolean hasInstallPermission = context.getPackageManager().canRequestPackageInstalls();
             if (!hasInstallPermission) {
                 startInstallPermissionSettingActivity(context);
@@ -197,7 +196,7 @@ public class AppUtils {
     public static Intent getInstallApkIntent(final Context context, File appFile) {
         try {
             Intent intent = new Intent("android.intent.action.VIEW");
-            if (Build.VERSION.SDK_INT >= 24) {
+            if (isTargetOver(context, 24) && Build.VERSION.SDK_INT >= 24) {
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 Uri fileUri = FileProvider
                         .getUriForFile(context,
@@ -217,7 +216,7 @@ public class AppUtils {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = 26)
     public static void startInstallPermissionSettingActivity(Context context) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

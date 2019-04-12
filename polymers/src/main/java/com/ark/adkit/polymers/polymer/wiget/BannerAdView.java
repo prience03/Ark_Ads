@@ -17,6 +17,7 @@ import com.ark.adkit.basics.data.ADMetaData;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
+import com.ark.adkit.polymers.ydt.utils.ScreenUtils;
 
 public class BannerAdView extends FrameLayout {
 
@@ -41,7 +42,7 @@ public class BannerAdView extends FrameLayout {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public BannerAdView(Context context, @Nullable AttributeSet attrs, int defStyleAttr,
-            int defStyleRes) {
+                        int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initView(context);
     }
@@ -50,8 +51,16 @@ public class BannerAdView extends FrameLayout {
         if (viewGroup.getChildCount() > 0) {
             viewGroup.removeAllViews();
         }
+        ViewGroup.LayoutParams layoutParams = viewGroup.getLayoutParams();
+        layoutParams.width = ScreenUtils.getScreenWidth(mContext);
+        layoutParams.height = dip2px(mContext, 65);
         viewGroup.addView(this);
         this.adMetaData = adMetas;
+    }
+
+    private int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
     }
 
     /**

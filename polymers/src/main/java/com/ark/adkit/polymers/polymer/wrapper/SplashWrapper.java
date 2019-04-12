@@ -2,16 +2,8 @@ package com.ark.adkit.polymers.polymer.wrapper;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
-import android.location.Location;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -27,17 +19,19 @@ import android.widget.TextView;
 import com.ark.adkit.basics.configs.ADConfig;
 import com.ark.adkit.basics.configs.ADOnlineConfig;
 import com.ark.adkit.basics.configs.ADStyle;
+import com.ark.adkit.basics.handler.Action;
+import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADSplashModel;
 import com.ark.adkit.basics.models.OnSplashImpl;
-import com.ark.adkit.basics.utils.GpsUtil;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.polymer.factory.ADSplashFactory;
 import com.ark.adkit.polymers.polymer.utils.ClockTicker;
-import com.ark.utils.permissions.PermissionCallback;
+import com.ark.adkit.polymers.polymer.utils.SimpleActivityLifecycleCallbacks;
 import com.ark.utils.permissions.PermissionChecker;
 import com.ark.utils.permissions.PermissionItem;
+import com.ark.utils.permissions.PermissionSimpleCallback;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -46,15 +40,11 @@ import java.util.Map;
 
 public class SplashWrapper {
 
-    public static int RequestCodeSettings = 200;//权限请求码
-    public static String PermissionTip1 = "亲爱的用户 \n\n软件部分功能需要请求您的手机权限，请允许以下权限：\n\n";//权限提醒
-    public static String PermissionTip2 = "\n请到 “应用信息 -> 权限” 中授予！";//权限提醒
-    public static String PermissionDialogPositiveButton = "去手动授权";
-    public static String PermissionDialogNegativeButton = "取消";
+    protected List<PermissionItem> mPermissionItemArrayList = new ArrayList<>();
+    protected boolean mRequestPermissions = true;
     private WeakReference<Activity> mActivityRef;
     private WeakReference<ViewGroup> mContainerRef;
     private WeakReference<TextView> mTextRef;
-    private List<PermissionItem> permissionItems = new ArrayList<>();
     private ClockTicker mClockTicker;
     private boolean splashClicked;
     private boolean splashLaunch;
@@ -125,45 +115,23 @@ public class SplashWrapper {
      * @param rootView     根容器，最好和广告容器分开
      * @param onSplashImpl 监听
      */
-    public void loadSplash(@NonNull final Activity mActivity, @NonNull ViewGroup viewGroup,
+    public void loadSplash(@NonNull Activity mActivity, @NonNull ViewGroup viewGroup,
             @NonNull ViewGroup rootView,
             @NonNull final OnSplashImpl onSplashImpl) {
         splashClicked = false;
         splashLaunch = false;
         mActivity.getApplication().registerActivityLifecycleCallbacks(
-                new Application.ActivityLifecycleCallbacks() {
-                    @Override
-                    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-
-                    }
-
-                    @Override
-                    public void onActivityStarted(Activity activity) {
-
-                    }
-
-                    @Override
-                    public void onActivityResumed(Activity activity) {
-
-                    }
-
-                    @Override
-                    public void onActivityPaused(Activity activity) {
-
-                    }
+                new SimpleActivityLifecycleCallbacks() {
 
                     @Override
                     public void onActivityStopped(Activity activity) {
+                        super.onActivityStopped(activity);
                         splashLaunch = true;
                     }
 
                     @Override
-                    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
-                    }
-
-                    @Override
                     public void onActivityDestroyed(Activity activity) {
+                        super.onActivityDestroyed(activity);
                         if (mClockTicker != null) {
                             mClockTicker.release();
                         }
@@ -172,127 +140,72 @@ public class SplashWrapper {
         mActivityRef = new WeakReference<>(mActivity);
         mContainerRef = new WeakReference<>(viewGroup);
         mTextRef = new WeakReference<>(addCountTextView(rootView, onSplashImpl));
-        permissionItems.clear();
-        permissionItems.add(new PermissionItem(Manifest.permission.WRITE_EXTERNAL_STORAGE, "存储权限"));
-        permissionItems.add(new PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "定位权限"));
-        permissionItems.add(new PermissionItem(Manifest.permission.READ_PHONE_STATE, "手机状态"));
+        if (!mRequestPermissions || mPermissionItemArrayList == null) {
+            checkPermissionsNext(onSplashImpl);
+            return;
+        }
+        //如果需要权限但是没有设置，则加入两个默认权限
+        if (mPermissionItemArrayList.isEmpty()) {
+            mPermissionItemArrayList
+                    .add(new PermissionItem(Manifest.permission.WRITE_EXTERNAL_STORAGE, "存储权限"));
+            mPermissionItemArrayList
+                    .add(new PermissionItem(Manifest.permission.READ_PHONE_STATE, "手机状态"));
+        }
         PermissionChecker.create(mActivity)
-                .permissions(permissionItems)
-                .checkMultiPermission(new PermissionCallback() {
+                .permissions(mPermissionItemArrayList)
+                .checkMultiPermission(new PermissionSimpleCallback() {
                     private static final long serialVersionUID = 5170045860554631205L;
 
                     @Override
                     public void onClose() {
-                        mActivity.finish();
+                        Activity validAct = getValidActivity();
+                        if (validAct != null) {
+                            validAct.finish();
+                        }
                     }
 
                     @Override
                     public void onFinish() {
-                        loadSplashWithPermissions(mActivity, onSplashImpl);
-                    }
-
-                    @Override
-                    public void onDeny(@NonNull String permission, int position) {
-                        LogUtils.i("onDeny" + permission);
-                    }
-
-                    @Override
-                    public void onGuarantee(@NonNull String permission,
-                            int position) {
-                        LogUtils.i("onGuarantee" + permission);
+                        checkPermissionsNext(onSplashImpl);
                     }
                 });
     }
 
-    private void loadSplashWithPermissions(@NonNull Activity activity,
-            @NonNull final OnSplashImpl onSplashImpl) {
-        boolean start = true;
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            Location location = GpsUtil.requestLocation(activity);
-            if (location == null) {
-                boolean isOpen = GpsUtil.isOPen(activity);
-                if (!isOpen) {
-                    start = false;
-                    openAppDetails(activity, "-定位", true);
+    private void checkPermissionsNext(@NonNull final OnSplashImpl onSplashImpl) {
+        mClockTicker = new ClockTicker();
+        mClockTicker.setEndTime(System.currentTimeMillis() + 5500);
+        mClockTicker.setClockListener(new ClockTicker.ClockListener() {
+            @Override
+            public void timeEnd() {
+                LogUtils.i("倒计时结束跳转");
+                if (!splashLaunch && !splashClicked) {
+                    onSplashImpl.onAdShouldLaunch();
+                }
+                if (mClockTicker!=null){
+                    mClockTicker.release();
                 }
             }
-        }
-        if (start) {
-            mClockTicker = new ClockTicker();
-            mClockTicker.setEndTime(System.currentTimeMillis() + 5500);
-            mClockTicker.setClockListener(new ClockTicker.ClockListener() {
-                @Override
-                public void timeEnd() {
-                    LogUtils.i("倒计时结束跳转");
-                    if (!splashLaunch && !splashClicked) {
-                        onSplashImpl.onAdShouldLaunch();
-                    }
-                }
 
-                @Override
-                public void onTick(long tick) {
-                    updateSkipText(tick);
-                    onSplashImpl.onAdTimeTick(tick);
-                }
-            });
-            mClockTicker.start();
-            ADConfig mADConfig = getConfig();
-            if (!mADConfig.hasAD()) {
-                LogUtils.e("开屏广告已被禁用,请检查在线配置");
-                onSplashImpl.onAdDisable();
-                return;
+            @Override
+            public void onTick(long tick) {
+                updateSkipText(tick);
+                onSplashImpl.onAdTimeTick(tick);
             }
-            if (mADConfig.size() == 0) {
-                onSplashImpl.onAdDisable();
-                return;
-            }
-            //开始按顺序加载开屏
-            index = 0;
-            loadOneByOne(mADConfig, onSplashImpl);
-        }
-    }
-
-    /**
-     * 打开APP详情页面，引导用户去设置权限
-     *
-     * @param activity        页面对象
-     * @param permissionNames 权限名称（如是多个，使用\n分割）
-     */
-    private void openAppDetails(@NonNull final Activity activity, @NonNull String permissionNames,
-            final boolean finish) {
-        if (activity.isFinishing()) {
+        });
+        mClockTicker.start();
+        ADConfig mADConfig = getConfig();
+        if (!mADConfig.hasAD()) {
+            LogUtils.e("开屏广告已被禁用,请检查在线配置");
+            onSplashImpl.onAdDisable();
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append(PermissionTip1);
-        sb.append(permissionNames);
-        sb.append(PermissionTip2);
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(sb.toString());
-        builder.setCancelable(false);
-        builder.setPositiveButton(PermissionDialogPositiveButton,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent locationIntent = new Intent(
-                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        if (!activity.isFinishing()) {
-                            activity.startActivityForResult(locationIntent, RequestCodeSettings);
-                        }
-                    }
-                });
-        builder.setNegativeButton(PermissionDialogNegativeButton,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (finish && !activity.isFinishing()) {
-                            activity.finish();
-                        }
-                    }
-                });
-        AlertDialog mDialog = builder.create();
-        mDialog.setCanceledOnTouchOutside(false);
-        mDialog.show();
+        if (mADConfig.size() == 0) {
+            onSplashImpl.onAdDisable();
+            return;
+        }
+        //开始按顺序加载开屏
+        index = 0;
+        loadOneByOne(mADConfig, onSplashImpl);
     }
 
     private Activity getValidActivity() {
@@ -321,8 +234,8 @@ public class SplashWrapper {
      */
     private void loadOneByOne(final @NonNull ADConfig mADConfig,
             final @NonNull OnSplashImpl onSplashImpl) {
-        final Activity activity = getValidActivity();
-        final ViewGroup viewGroup = getValidViewGroup();
+        Activity activity = getValidActivity();
+        ViewGroup viewGroup = getValidViewGroup();
         if (activity == null || viewGroup == null) {
             return;
         }
@@ -340,18 +253,17 @@ public class SplashWrapper {
             adOnlineConfig.adStyle = ADStyle.POS_SPLASH;
             final ADSplashModel adSplashModel = ADSplashFactory.createSplash(sortStr);
             if (adSplashModel == null) {
-                activity.runOnUiThread(new Runnable() {
+                Run.onUiAsync(new Action() {
                     @Override
-                    public void run() {
+                    public void call() {
                         loadOneByOne(mADConfig, onSplashImpl);
                     }
                 });
             } else {
-                activity.runOnUiThread(new Runnable() {
+                Run.onUiAsync(new Action() {
                     @Override
-                    public void run() {
-                        splashModelLoad(adSplashModel, activity, viewGroup, adOnlineConfig,
-                                mADConfig, onSplashImpl);
+                    public void call() {
+                        splashModelLoad(adSplashModel, adOnlineConfig, mADConfig, onSplashImpl);
                     }
                 });
             }
@@ -361,10 +273,14 @@ public class SplashWrapper {
     }
 
     private void splashModelLoad(@NonNull ADSplashModel adSplashModel,
-            @NonNull Activity activity, @NonNull ViewGroup viewGroup,
             @NonNull ADOnlineConfig adOnlineConfig,
             @NonNull final ADConfig mADConfig,
             @NonNull final OnSplashImpl onSplashImpl) {
+        Activity activity = getValidActivity();
+        ViewGroup viewGroup = getValidViewGroup();
+        if (activity == null || viewGroup == null) {
+            return;
+        }
         adSplashModel.initModel(adOnlineConfig);
         adSplashModel.loadSplashAD(activity, viewGroup, new OnSplashImpl() {
             @Override

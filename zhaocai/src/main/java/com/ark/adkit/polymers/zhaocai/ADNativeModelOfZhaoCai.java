@@ -88,8 +88,6 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
     @Nullable
     @Override
     public Object getData(@Nullable final Context context) {
-        Lock lock = new ReentrantLock();
-        lock.lock();
         if (context == null) {
             LogUtils.e("wskj取出广告被终止,当前上下文已被销毁");
             return null;

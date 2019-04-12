@@ -1,15 +1,12 @@
 package com.ark.sample;
 
-import android.Manifest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.ark.adkit.basics.configs.ADPlatform;
 import com.ark.adkit.basics.handler.Action;
 import com.ark.adkit.basics.handler.Run;
@@ -20,14 +17,10 @@ import com.ark.adkit.polymers.polymer.interrcmd.RecommendDialog;
 import com.ark.adkit.polymers.self.SelfADStyle;
 import com.ark.adkit.polymers.self.SelfDataRef;
 import com.ark.adkit.polymers.self.SelfNativeAD;
-import com.ark.utils.permissions.PermissionCallback;
-import com.ark.utils.permissions.PermissionChecker;
-import com.ark.utils.permissions.PermissionItem;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 public class MainActivity extends AppCompatActivity implements SplashFragment.OnPreparedListener {
 
@@ -86,45 +79,16 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
 
     @Override
     public void onCreateView(final ViewGroup rootView, final ViewGroup adContainer) {
-        List<PermissionItem> list = new ArrayList<>();
-        list.add(new PermissionItem(Manifest.permission.ACCESS_FINE_LOCATION, "定位"));
-        list.add(new PermissionItem(Manifest.permission.WRITE_EXTERNAL_STORAGE, "存储"));
-        list.add(new PermissionItem(Manifest.permission.READ_PHONE_STATE, "打电话"));
-        list.add(new PermissionItem(Manifest.permission.CAMERA, "相机"));
-        list.add(new PermissionItem(Manifest.permission.RECORD_AUDIO, "录音"));
-        PermissionChecker.create(this).permissions(list)
-                .checkMultiPermission(new PermissionCallback() {
-                    private static final long serialVersionUID = -6487903471146122873L;
-
-                    @Override
-                    public void onClose() {
-                        finish();
-                    }
-
-                    @Override
-                    public void onFinish() {
-                        Toast.makeText(MainActivity.this, "所有权限已经获取", Toast.LENGTH_SHORT).show();
-                        loadSplash(rootView, adContainer);
-                        loadBanner();
-                        loadNative();
-                    }
-
-                    @Override
-                    public void onDeny(@NonNull String permission, int position) {
-                        Log.e("logger", "onDeny" + permission);
-                    }
-
-                    @Override
-                    public void onGuarantee(@NonNull String permission, int position) {
-                        Log.e("logger", "onGuarantee" + permission);
-                    }
-                });
+        loadSplash(rootView, adContainer);
+        loadBanner();
+        loadNative();
     }
 
     private void loadSplash(final ViewGroup rootView, final ViewGroup adContainer) {
         ADTool.getADTool()
                 .getManager()
                 .getSplashWrapper()
+                .needPermissions(true)
                 .loadSplash(this, adContainer, rootView, mOnSplashImpl);
     }
 
@@ -170,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
         Run.onBackground(new Action() {
             @Override
             public void call() {
-                LogUtils.e("call thread:"+Thread.currentThread().getName());
+                LogUtils.e("call thread:" + Thread.currentThread().getName());
                 mStringList.clear();
                 mStringList.add("1:" + ADPlatform.GDT);
                 mStringList.add("2:" + ADPlatform.IFLY);
@@ -186,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
                 Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
-                        LogUtils.e("ui thread:"+Thread.currentThread().getName());
+                        LogUtils.e("ui thread:" + Thread.currentThread().getName());
                         mTextView.setText(mStringList.toString());
                     }
                 });

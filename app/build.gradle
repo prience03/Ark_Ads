@@ -34,20 +34,20 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.tencent:mmkv:1.0.17'
+    implementation 'com.tencent:mmkv:1.0.18'
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
 
     implementation 'com.ark.custom:permissions:1.0.0'
     implementation 'com.ark.custom:kvalue:1.0.0'
     implementation 'com.ark.custom:webview:1.0.0'
 
-//    implementation 'com.ark.ads:basics:1.0.1'
-//    implementation 'com.ark.ads:core:1.0.1'
-//    implementation 'com.ark.ads:iflytek:1.0.1'
-//    implementation 'com.ark.ads:longyun:1.0.1'
-//    implementation 'com.ark.ads:zhaocai:1.0.1'
-//    implementation 'com.ark.ads:gdt:1.0.1'
-//    implementation 'com.ark.ads:ttad:1.0.1'
+//    implementation 'com.ark.ads:basics:1.1.0'
+//    implementation 'com.ark.ads:core:1.1.0'
+//    implementation 'com.ark.ads:iflytek:1.1.0'
+//    implementation 'com.ark.ads:longyun:1.1.0'
+//    implementation 'com.ark.ads:zhaocai:1.1.0'
+//    implementation 'com.ark.ads:gdt:1.1.0'
+//    implementation 'com.ark.ads:ttad:1.1.0'
 
     implementation project (':polymers')
     implementation project(':ttad')
