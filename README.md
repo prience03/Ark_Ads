@@ -5,12 +5,12 @@
 ```groovy
 maven { url 'http://nexus.xiaoc.cn/repository/maven-releases/'}
 
-implementation 'com.ark.ads:core:1.0.0'
-implementation 'com.ark.ads:iflytek:1.0.0'
-implementation 'com.ark.ads:longyun:1.0.0'
-implementation 'com.ark.ads:zhaocai:1.0.0'
-implementation 'com.ark.ads:gdt:1.0.0'
-implementation 'com.ark.ads:ttad:1.0.0'
+implementation 'com.ark.ads:core:1.1.0'(必须)
+implementation 'com.ark.ads:iflytek:1.1.0'(科大讯飞广告)
+implementation 'com.ark.ads:longyun:1.1.0'(龙云聚合广告，包含GDTUnionSDK.4.19.574.min.jar)
+implementation 'com.ark.ads:zhaocai:1.1.0'(无双科技广告,已去除广点通依赖)
+implementation 'com.ark.ads:gdt:1.1.0'(广点通单独依赖时需要拷贝GDTUnionSDK.4.19.574.min.jar)
+implementation 'com.ark.ads:ttad:1.1.0'(今日头条穿山甲广告)
 ```
 ### 初始化SDK，非必须
 ```java
@@ -26,6 +26,8 @@ ADTool.initialize(new ADTool.Builder()
 ```java
 ADTool.getADTool().getManager()
         .getSplashWrapper()
+        .needPermissions(true)//是否由SDK申请必要权限
+        .setPermissions(list)//自定义权限列表
         .loadSplash(activity, adContainer, rootView, new OnSplashImpl() {
 
                 @Override
