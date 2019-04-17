@@ -5,7 +5,8 @@
 ```groovy
 maven { url 'http://nexus.xiaoc.cn/repository/maven-releases/'}
 
-implementation 'com.ark.ads:core:1.1.0'(必须)
+implementation 'com.ark.ads:basics:1.1.0'(必须,广告基础库)
+implementation 'com.ark.ads:core:1.1.0'(必须，广告聚合处理)
 implementation 'com.ark.ads:iflytek:1.1.0'(科大讯飞广告)
 implementation 'com.ark.ads:longyun:1.1.0'(龙云聚合广告，包含GDTUnionSDK.4.19.574.min.jar)
 implementation 'com.ark.ads:zhaocai:1.1.0'(无双科技广告,已去除广点通依赖)
@@ -15,9 +16,9 @@ implementation 'com.ark.ads:ttad:1.1.0'(今日头条穿山甲广告)
 ### 初始化SDK，非必须
 ```java
 ADTool.initialize(new ADTool.Builder()
-        .setStrategy(Strategy.cycle)//按sort轮流排序策略
-        .setLoadOtherWhenVideoDisable(true)//视频广告失败后尝试其他原生横图广告填充
-        .setLocalConfig(JsonUtils.getJson(this,"localconfig.json"))//使用本地json字符串配置
+        //.setStrategy(Strategy.cycle)//按sort轮流排序策略
+        //.setLoadOtherWhenVideoDisable(true)//视频广告失败后尝试其他原生横图广告填充
+        //.setLocalConfig(JsonUtils.getJson(this,"localconfig.json"))//使用本地json字符串配置
         .setDebugMode(BuildConfig.DEBUG)//调试模式（日志打印，平台标识）
         .build());
 ```
