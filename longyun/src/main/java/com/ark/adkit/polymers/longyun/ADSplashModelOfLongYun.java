@@ -48,7 +48,7 @@ public class ADSplashModelOfLongYun extends ADSplashModel {
 
                                 @Override
                                 public void onAdDisplay(String s) {
-                                    onSplashListener.onAdDisplay(mConfig.platform, true);
+                                    onSplashListener.onAdDisplay(mConfig.platform);
                                 }
 
                                 @Override

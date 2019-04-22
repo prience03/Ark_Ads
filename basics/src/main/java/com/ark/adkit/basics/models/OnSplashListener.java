@@ -6,7 +6,7 @@ public interface OnSplashListener {
 
     void onAdWillLoad(@NonNull String platform);
 
-    void onAdDisplay(@NonNull String platform, boolean hideSelfTicker);
+    void onAdDisplay(@NonNull String platform);
 
     void onAdClicked(@NonNull String platform);
 

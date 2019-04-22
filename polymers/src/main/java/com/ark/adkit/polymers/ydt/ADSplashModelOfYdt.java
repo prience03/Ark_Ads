@@ -45,7 +45,6 @@ public class ADSplashModelOfYdt extends ADSplashModel {
             @NonNull final SplashAdView.SplashCallBack splashCallBack) {
         this.splashCallBack = splashCallBack;
         splashAdView = new SplashAdView(viewGroup.getContext());
-        viewGroup.removeAllViews();
         viewGroup.addView(splashAdView);
         return this;
     }
@@ -142,7 +141,7 @@ public class ADSplashModelOfYdt extends ADSplashModel {
         init(viewGroup, new SplashAdView.SplashCallBack() {
             @Override
             public void onAdDisplay() {
-                onSplashListener.onAdDisplay(ADPlatform.YDT, false);
+                onSplashListener.onAdDisplay(ADPlatform.YDT);
             }
 
             @Override

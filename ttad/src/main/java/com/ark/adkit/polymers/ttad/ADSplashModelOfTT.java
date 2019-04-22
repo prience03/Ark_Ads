@@ -56,9 +56,8 @@ public class ADSplashModelOfTT extends ADSplashModel {
 
                 @Override
                 public void onSplashAdLoad(final TTSplashAd ttSplashAd) {
-                    onSplashListener.onAdDisplay(mConfig.platform, true);
+                    onSplashListener.onAdDisplay(mConfig.platform);
                     View splashAdView = ttSplashAd.getSplashView();
-                    viewGroup.removeAllViews();
                     viewGroup.addView(splashAdView);
                     ttSplashAd.setSplashInteractionListener(new TTSplashAd.AdInteractionListener() {
                         @Override

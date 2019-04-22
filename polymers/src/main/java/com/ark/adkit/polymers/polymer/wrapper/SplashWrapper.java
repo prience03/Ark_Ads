@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.text.TextUtils;
@@ -16,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 import com.ark.adkit.basics.configs.ADConfig;
 import com.ark.adkit.basics.configs.ADOnlineConfig;
 import com.ark.adkit.basics.configs.ADStyle;
@@ -44,11 +46,14 @@ public class SplashWrapper {
     protected boolean mRequestPermissions = true;
     private WeakReference<Activity> mActivityRef;
     private WeakReference<ViewGroup> mContainerRef;
+    private WeakReference<ViewGroup> mRootViewRef;
     private WeakReference<TextView> mTextRef;
     private ClockTicker mClockTicker;
     private boolean splashClicked;
     private boolean splashLaunch;
     private int index = 0;
+    @Nullable
+    private OnSplashImpl onSplashImpl;
 
     /**
      * 配置参数
@@ -97,29 +102,28 @@ public class SplashWrapper {
     /**
      * 取消隐藏自己的倒计时
      */
-    public void hideSelfTimer(boolean hide) {
-        if (hide && mClockTicker != null) {
-            mClockTicker.release();
-        }
-        final TextView countTextView = getValidSkipTextView();
-        if (countTextView != null) {
-            countTextView.setVisibility(hide ? View.GONE : View.VISIBLE);
+    private void resetCount() {
+        TextView countTextView = getValidSkipTextView();
+        ViewGroup viewGroup = getValidRootView();
+        if (countTextView == null && viewGroup != null) {
+            mTextRef = new WeakReference<>(addCountTextView(viewGroup));
         }
     }
 
     /**
      * 加载开屏
      *
-     * @param mActivity    上下文
-     * @param viewGroup    容器
-     * @param rootView     根容器，最好和广告容器分开
-     * @param onSplashImpl 监听
+     * @param mActivity     上下文
+     * @param adContainer   容器
+     * @param skipViewGroup 根容器，最好和广告容器分开
+     * @param onSplashImpl  监听
      */
-    public void loadSplash(@NonNull Activity mActivity, @NonNull ViewGroup viewGroup,
-            @NonNull ViewGroup rootView,
-            @NonNull final OnSplashImpl onSplashImpl) {
+    public void loadSplash(@NonNull Activity mActivity, @NonNull ViewGroup adContainer,
+                           @NonNull ViewGroup skipViewGroup,
+                           @NonNull final OnSplashImpl onSplashImpl) {
         splashClicked = false;
         splashLaunch = false;
+        this.onSplashImpl = onSplashImpl;
         mActivity.getApplication().registerActivityLifecycleCallbacks(
                 new SimpleActivityLifecycleCallbacks() {
 
@@ -138,10 +142,11 @@ public class SplashWrapper {
                     }
                 });
         mActivityRef = new WeakReference<>(mActivity);
-        mContainerRef = new WeakReference<>(viewGroup);
-        mTextRef = new WeakReference<>(addCountTextView(rootView, onSplashImpl));
+        mContainerRef = new WeakReference<>(adContainer);
+        mRootViewRef = new WeakReference<>(skipViewGroup);
+        mTextRef = new WeakReference<>(addCountTextView(skipViewGroup));
         if (!mRequestPermissions || mPermissionItemArrayList == null) {
-            checkPermissionsNext(onSplashImpl);
+            checkPermissionsNext();
             return;
         }
         //如果需要权限但是没有设置，则加入两个默认权限
@@ -166,12 +171,12 @@ public class SplashWrapper {
 
                     @Override
                     public void onFinish() {
-                        checkPermissionsNext(onSplashImpl);
+                        checkPermissionsNext();
                     }
                 });
     }
 
-    private void checkPermissionsNext(@NonNull final OnSplashImpl onSplashImpl) {
+    private void checkPermissionsNext() {
         mClockTicker = new ClockTicker();
         mClockTicker.setEndTime(System.currentTimeMillis() + 5500);
         mClockTicker.setClockListener(new ClockTicker.ClockListener() {
@@ -179,9 +184,11 @@ public class SplashWrapper {
             public void timeEnd() {
                 LogUtils.i("倒计时结束跳转");
                 if (!splashLaunch && !splashClicked) {
-                    onSplashImpl.onAdShouldLaunch();
+                    if (onSplashImpl != null) {
+                        onSplashImpl.onAdShouldLaunch();
+                    }
                 }
-                if (mClockTicker!=null){
+                if (mClockTicker != null) {
                     mClockTicker.release();
                 }
             }
@@ -189,23 +196,29 @@ public class SplashWrapper {
             @Override
             public void onTick(long tick) {
                 updateSkipText(tick);
-                onSplashImpl.onAdTimeTick(tick);
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdTimeTick(tick);
+                }
             }
         });
         mClockTicker.start();
         ADConfig mADConfig = getConfig();
         if (!mADConfig.hasAD()) {
             LogUtils.e("开屏广告已被禁用,请检查在线配置");
-            onSplashImpl.onAdDisable();
+            if (onSplashImpl != null) {
+                onSplashImpl.onAdDisable();
+            }
             return;
         }
         if (mADConfig.size() == 0) {
-            onSplashImpl.onAdDisable();
+            if (onSplashImpl != null) {
+                onSplashImpl.onAdDisable();
+            }
             return;
         }
         //开始按顺序加载开屏
         index = 0;
-        loadOneByOne(mADConfig, onSplashImpl);
+        loadOneByOne(mADConfig);
     }
 
     private Activity getValidActivity() {
@@ -222,6 +235,10 @@ public class SplashWrapper {
         return mContainerRef == null ? null : mContainerRef.get();
     }
 
+    private ViewGroup getValidRootView() {
+        return mRootViewRef == null ? null : mRootViewRef.get();
+    }
+
     private TextView getValidSkipTextView() {
         return mTextRef == null ? null : mTextRef.get();
     }
@@ -229,18 +246,18 @@ public class SplashWrapper {
     /**
      * 实际加载开屏操作
      *
-     * @param mADConfig    参数配置
-     * @param onSplashImpl 监听
+     * @param mADConfig 参数配置
      */
-    private void loadOneByOne(final @NonNull ADConfig mADConfig,
-            final @NonNull OnSplashImpl onSplashImpl) {
+    private void loadOneByOne(final @NonNull ADConfig mADConfig) {
         Activity activity = getValidActivity();
         ViewGroup viewGroup = getValidViewGroup();
         if (activity == null || viewGroup == null) {
             return;
         }
         if (index >= mADConfig.size()) {
-            onSplashImpl.onAdDisable();
+            if (onSplashImpl != null) {
+                onSplashImpl.onAdDisable();
+            }
             return;
         }
         final String sortStr = mADConfig.getSortList().get(index);
@@ -256,26 +273,25 @@ public class SplashWrapper {
                 Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
-                        loadOneByOne(mADConfig, onSplashImpl);
+                        loadOneByOne(mADConfig);
                     }
                 });
             } else {
                 Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
-                        splashModelLoad(adSplashModel, adOnlineConfig, mADConfig, onSplashImpl);
+                        splashModelLoad(adSplashModel, adOnlineConfig, mADConfig);
                     }
                 });
             }
         } else {
-            loadOneByOne(mADConfig, onSplashImpl);
+            loadOneByOne(mADConfig);
         }
     }
 
     private void splashModelLoad(@NonNull ADSplashModel adSplashModel,
-            @NonNull ADOnlineConfig adOnlineConfig,
-            @NonNull final ADConfig mADConfig,
-            @NonNull final OnSplashImpl onSplashImpl) {
+                                 @NonNull ADOnlineConfig adOnlineConfig,
+                                 @NonNull final ADConfig mADConfig) {
         Activity activity = getValidActivity();
         ViewGroup viewGroup = getValidViewGroup();
         if (activity == null || viewGroup == null) {
@@ -286,7 +302,9 @@ public class SplashWrapper {
             @Override
             public void onAdDisable() {
                 super.onAdDisable();
-                onSplashImpl.onAdDisable();
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdDisable();
+                }
             }
 
             @Override
@@ -298,45 +316,59 @@ public class SplashWrapper {
                             mClockTicker.release();
                         }
                     }
-                    onSplashImpl.onAdShouldLaunch();
+                    if (onSplashImpl != null) {
+                        onSplashImpl.onAdShouldLaunch();
+                    }
                     return;
                 }
                 updateSkipText(tick);
                 if (!splashLaunch) {
-                    onSplashImpl.onAdTimeTick(tick);
+                    if (onSplashImpl != null) {
+                        onSplashImpl.onAdTimeTick(tick);
+                    }
                 }
             }
 
             @Override
             public void onAdWillLoad(@NonNull String platform) {
                 super.onAdWillLoad(platform);
-                onSplashImpl.onAdWillLoad(platform);
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdWillLoad(platform);
+                }
             }
 
             @Override
-            public void onAdDisplay(@NonNull String platform, boolean hideSelfTicker) {
-                super.onAdDisplay(platform, hideSelfTicker);
-                hideSelfTimer(hideSelfTicker);
-                onSplashImpl.onAdDisplay(platform, hideSelfTicker);
+            public void onAdDisplay(@NonNull String platform) {
+                super.onAdDisplay(platform);
+                resetCount();
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdDisplay(platform);
+                }
             }
 
             @Override
             public void onAdClicked(@NonNull String platform) {
                 super.onAdClicked(platform);
                 splashClicked = true;
-                onSplashImpl.onAdClicked(platform);
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdClicked(platform);
+                }
             }
 
             @Override
             public void onAdClosed(@NonNull String platform) {
                 super.onAdClosed(platform);
-                onSplashImpl.onAdClosed(platform);
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdClosed(platform);
+                }
                 if (!splashLaunch && !splashClicked) {
                     splashLaunch = true;
                     if (mClockTicker != null) {
                         mClockTicker.release();
                     }
-                    onSplashImpl.onAdShouldLaunch();
+                    if (onSplashImpl != null) {
+                        onSplashImpl.onAdShouldLaunch();
+                    }
                 }
             }
 
@@ -346,21 +378,24 @@ public class SplashWrapper {
                 if (mClockTicker != null) {
                     mClockTicker.release();
                 }
-                onSplashImpl.onAdShouldLaunch();
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdShouldLaunch();
+                }
             }
 
             @Override
             public void onAdFailed(@NonNull String platform, int errorCode,
-                    @NonNull String errorMsg) {
+                                   @NonNull String errorMsg) {
                 super.onAdFailed(platform, errorCode, errorMsg);
-                onSplashImpl.onAdFailed(platform, errorCode, errorMsg);
-                loadOneByOne(mADConfig, onSplashImpl);
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdFailed(platform, errorCode, errorMsg);
+                }
+                loadOneByOne(mADConfig);
             }
         });
     }
 
-    private TextView addCountTextView(@NonNull ViewGroup container,
-            @NonNull final OnSplashImpl onSplashImpl) {
+    private TextView addCountTextView(@NonNull ViewGroup container) {
         Context context = container.getContext();
         TextView countTextView = new TextView(context);
         countTextView.setId(R.id.text_skip);
@@ -386,7 +421,9 @@ public class SplashWrapper {
                 if (mClockTicker != null) {
                     mClockTicker.release();
                 }
-                onSplashImpl.onAdShouldLaunch();
+                if (onSplashImpl != null) {
+                    onSplashImpl.onAdShouldLaunch();
+                }
             }
         });
         if (container instanceof RelativeLayout) {

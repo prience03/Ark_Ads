@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.novv.resshare"
-        minSdkVersion 16
+        minSdkVersion 18
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -41,13 +41,13 @@ dependencies {
     implementation 'com.ark.custom:kvalue:1.0.0'
     implementation 'com.ark.custom:webview:1.0.0'
 
-//    implementation 'com.ark.ads:basics:1.1.0'
-//    implementation 'com.ark.ads:core:1.1.0'
-//    implementation 'com.ark.ads:iflytek:1.1.0'
-//    implementation 'com.ark.ads:longyun:1.1.0'
-//    implementation 'com.ark.ads:zhaocai:1.1.0'
-//    implementation 'com.ark.ads:gdt:1.1.0'
-//    implementation 'com.ark.ads:ttad:1.1.0'
+//    implementation 'com.ark.ads:basics:1.2.0'
+//    implementation 'com.ark.ads:core:1.2.0'
+//    implementation 'com.ark.ads:iflytek:1.2.0'
+//    implementation 'com.ark.ads:longyun:1.2.0'
+//    implementation 'com.ark.ads:zhaocai:1.2.0'
+//    implementation 'com.ark.ads:gdt:1.2.0'
+//    implementation 'com.ark.ads:ttad:1.2.0'
 
     implementation project (':polymers')
     implementation project(':ttad')

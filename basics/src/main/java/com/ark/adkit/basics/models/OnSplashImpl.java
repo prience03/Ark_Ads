@@ -14,7 +14,7 @@ public abstract class OnSplashImpl implements OnSplashListener {
     }
 
     @Override
-    public void onAdDisplay(@NonNull String platform, boolean hideSelfTicker) {
+    public void onAdDisplay(@NonNull String platform) {
 
     }
 

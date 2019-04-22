@@ -71,7 +71,7 @@ public class ADSplashModelOfZhaoCai extends ADSplashModel {
 
                 @Override
                 public void onAdShown() {
-                    onSplashListener.onAdDisplay(mConfig.platform, true);
+                    onSplashListener.onAdDisplay(mConfig.platform);
                 }
 
                 @Override

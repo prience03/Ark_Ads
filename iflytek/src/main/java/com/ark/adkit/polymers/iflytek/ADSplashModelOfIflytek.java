@@ -58,13 +58,12 @@ public class ADSplashModelOfIflytek extends ADSplashModel {
                                         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
                                                 ViewGroup.LayoutParams.MATCH_PARENT,
                                                 ViewGroup.LayoutParams.MATCH_PARENT);
-                                        viewGroup.removeAllViews();
                                         ImageView imageView = new ImageView(activity);
                                         imageView.setScaleType(ImageView.ScaleType.FIT_XY);
                                         viewGroup.addView(imageView, layoutParams);
                                         AQuery aQuery = new AQuery(imageView);
                                         aQuery.image(metaDataOfIflytek.getImgUrl(), true, true);
-                                        onSplashListener.onAdDisplay(mConfig.platform, false);
+                                        onSplashListener.onAdDisplay(mConfig.platform);
                                         metaDataOfIflytek.handleView(viewGroup);
                                         viewGroup.setOnClickListener(new View.OnClickListener() {
                                             @Override

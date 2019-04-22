@@ -30,7 +30,7 @@ public class ADSplashModelOfSelf extends ADSplashModel {
 
             @Override
             public void onAdDisplay() {
-                onSplashListener.onAdDisplay(mConfig.platform, false);
+                onSplashListener.onAdDisplay(mConfig.platform);
             }
 
             @Override

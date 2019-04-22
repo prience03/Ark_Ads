@@ -55,7 +55,7 @@ public class ADSplashModelOfGdt extends ADSplashModel {
 
                                 @Override
                                 public void onADPresent() {
-                                    onSplashListener.onAdDisplay(mConfig.platform, true);
+                                    onSplashListener.onAdDisplay(mConfig.platform);
                                 }
 
                                 @Override
