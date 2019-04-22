@@ -14,9 +14,15 @@ implementation 'com.ark.ads:gdt:1.2.0'(广点通单独依赖时需要拷贝GDTUn
 implementation 'com.ark.ads:ttad:1.2.0'(今日头条穿山甲广告)
 ```
 
-### Gradle   version 2.x (GDTUnionSDK<4.20,ZhaoCai_Ad_SDK<3.0)
+### Gradle   version 2.x (GDTUnionSDK>=4.20,ZhaoCai_Ad_SDK>=3.0)
 ```groovy
-
+implementation 'com.ark.ads:basics:2.0.0'(必须,广告基础库)
+implementation 'com.ark.ads:core:2.0.0'(必须，广告聚合处理)
+implementation 'com.ark.ads:iflytek:2.0.0'(科大讯飞广告)
+implementation 'com.ark.ads:longyun:2.0.0'(龙云聚合广告，包含GDTUnionSDK.4.24.894.min.jar)
+implementation 'com.ark.ads:zhaocai:2.0.0'(无双科技广告,已去除广点通依赖)
+implementation 'com.ark.ads:gdt:2.0.0'(广点通单独依赖时需要拷贝GDTUnionSDK.4.24.894.min.jar)
+implementation 'com.ark.ads:ttad:2.0.0'(今日头条穿山甲广告)
 ```
 
 ### 初始化SDK，非必须
