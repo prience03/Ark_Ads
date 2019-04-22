@@ -3,11 +3,11 @@ package com.ark.adkit.polymers.polymer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.ImageView;
-import com.androidquery.callback.AQuery2;
+
+import com.androidquery.AQuery;
 import com.ark.adkit.polymers.polymer.wrapper.ConfigWrapperImpl;
 import com.ark.adkit.polymers.polymer.wrapper.NativeWrapperImpl;
 import com.ark.adkit.polymers.polymer.wrapper.SplashWrapperImpl;
-import com.ark.dict.Utils;
 
 public class ADManager {
 
@@ -36,7 +36,7 @@ public class ADManager {
         if (imgUrl == null || imageView == null) {
             return;
         }
-        AQuery2 aQuery = new AQuery2(Utils.getContext());
+        AQuery aQuery = new AQuery(imageView.getContext());
         aQuery.id(imageView).image(imgUrl, true, true);
     }
 
