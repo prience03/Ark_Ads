@@ -2,12 +2,16 @@ package com.ark.adkit.polymers.polymer.wrapper;
 
 import android.Manifest;
 import android.app.Activity;
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -30,7 +34,6 @@ import com.ark.adkit.polymers.R;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.polymer.factory.ADSplashFactory;
 import com.ark.adkit.polymers.polymer.utils.ClockTicker;
-import com.ark.adkit.polymers.polymer.utils.SimpleActivityLifecycleCallbacks;
 import com.ark.utils.permissions.PermissionChecker;
 import com.ark.utils.permissions.PermissionItem;
 import com.ark.utils.permissions.PermissionSimpleCallback;
@@ -49,11 +52,11 @@ public class SplashWrapper {
     private WeakReference<ViewGroup> mRootViewRef;
     private WeakReference<TextView> mTextRef;
     private ClockTicker mClockTicker;
-    private boolean splashClicked;
-    private boolean splashLaunch;
     private int index = 0;
     @Nullable
     private OnSplashImpl onSplashImpl;
+    private boolean isLaunched;
+    private boolean isForeground;
 
     /**
      * 配置参数
@@ -103,6 +106,7 @@ public class SplashWrapper {
      * 取消隐藏自己的倒计时
      */
     private void resetCount() {
+        resetClock();
         TextView countTextView = getValidSkipTextView();
         ViewGroup viewGroup = getValidRootView();
         if (countTextView == null && viewGroup != null) {
@@ -113,38 +117,61 @@ public class SplashWrapper {
     /**
      * 加载开屏
      *
-     * @param mActivity     上下文
-     * @param adContainer   容器
-     * @param skipViewGroup 根容器，最好和广告容器分开
-     * @param onSplashImpl  监听
+     * @param mActivity    上下文
+     * @param adContainer  容器
+     * @param rootView     根容器，最好和广告容器分开(不要使用LinearLayout，否则跳过按钮可能不可见)
+     * @param onSplashImpl 监听
      */
-    public void loadSplash(@NonNull Activity mActivity, @NonNull ViewGroup adContainer,
-                           @NonNull ViewGroup skipViewGroup,
-                           @NonNull final OnSplashImpl onSplashImpl) {
-        splashClicked = false;
-        splashLaunch = false;
+    public void loadSplash(@NonNull final Activity mActivity, @NonNull ViewGroup adContainer,
+                           @NonNull ViewGroup rootView,
+                           @NonNull OnSplashImpl onSplashImpl) {
+        if (mActivity instanceof AppCompatActivity) {
+            ((AppCompatActivity) mActivity).getLifecycle().addObserver(new LifecycleObserver() {
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+                void onResume() {
+                    isForeground = true;
+                    LogUtils.i("onActivityResumed");
+                }
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+                void onStop() {
+                    isForeground = false;
+                    LogUtils.i("onActivityStopped");
+                }
+
+                @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                void onDestroy() {
+                    LogUtils.i("onActivityDestroyed");
+                    if (mClockTicker != null) {
+                        mClockTicker.release();
+                        mClockTicker = null;
+                    }
+                    if (mActivityRef != null) {
+                        mActivityRef.clear();
+                        mActivityRef = null;
+                    }
+                    if (mRootViewRef != null) {
+                        mRootViewRef.clear();
+                        mRootViewRef = null;
+                    }
+                    if (mContainerRef != null) {
+                        mContainerRef.clear();
+                        mContainerRef = null;
+                    }
+                    LogUtils.i("splash destroy ,release SplashADs");
+                }
+            });
+        }
+        isLaunched = false;
         this.onSplashImpl = onSplashImpl;
-        mActivity.getApplication().registerActivityLifecycleCallbacks(
-                new SimpleActivityLifecycleCallbacks() {
-
-                    @Override
-                    public void onActivityStopped(Activity activity) {
-                        super.onActivityStopped(activity);
-                        splashLaunch = true;
-                    }
-
-                    @Override
-                    public void onActivityDestroyed(Activity activity) {
-                        super.onActivityDestroyed(activity);
-                        if (mClockTicker != null) {
-                            mClockTicker.release();
-                        }
-                    }
-                });
+        if (rootView instanceof LinearLayout) {
+            LogUtils.e("不要使用LinearLayout，否则跳过按钮可能不可见");
+        }
         mActivityRef = new WeakReference<>(mActivity);
         mContainerRef = new WeakReference<>(adContainer);
-        mRootViewRef = new WeakReference<>(skipViewGroup);
-        mTextRef = new WeakReference<>(addCountTextView(skipViewGroup));
+        mRootViewRef = new WeakReference<>(rootView);
+        mTextRef = new WeakReference<>(addCountTextView(rootView));
         if (!mRequestPermissions || mPermissionItemArrayList == null) {
             checkPermissionsNext();
             return;
@@ -176,25 +203,32 @@ public class SplashWrapper {
                 });
     }
 
-    private void checkPermissionsNext() {
+    private void resetClock() {
+        if (mClockTicker != null) {
+            mClockTicker.release();
+        }
         mClockTicker = new ClockTicker();
         mClockTicker.setEndTime(System.currentTimeMillis() + 5500);
         mClockTicker.setClockListener(new ClockTicker.ClockListener() {
             @Override
             public void timeEnd() {
-                LogUtils.i("倒计时结束跳转");
-                if (!splashLaunch && !splashClicked) {
-                    if (onSplashImpl != null) {
-                        onSplashImpl.onAdShouldLaunch();
-                    }
+                Activity activity = getValidActivity();
+                if (activity == null) {
+                    return;
                 }
-                if (mClockTicker != null) {
-                    mClockTicker.release();
+                if (!isForeground) {
+                    return;
+                }
+                if (onSplashImpl != null && !isLaunched) {
+                    LogUtils.i("倒计时结束跳转");
+                    isLaunched = true;
+                    onSplashImpl.onAdShouldLaunch();
                 }
             }
 
             @Override
             public void onTick(long tick) {
+                LogUtils.i("splash timeTick--->" + tick);
                 updateSkipText(tick);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdTimeTick(tick);
@@ -202,6 +236,10 @@ public class SplashWrapper {
             }
         });
         mClockTicker.start();
+    }
+
+    private void checkPermissionsNext() {
+        resetClock();
         ADConfig mADConfig = getConfig();
         if (!mADConfig.hasAD()) {
             LogUtils.e("开屏广告已被禁用,请检查在线配置");
@@ -290,7 +328,7 @@ public class SplashWrapper {
     }
 
     private void splashModelLoad(@NonNull ADSplashModel adSplashModel,
-                                 @NonNull ADOnlineConfig adOnlineConfig,
+                                 @NonNull final ADOnlineConfig adOnlineConfig,
                                  @NonNull final ADConfig mADConfig) {
         Activity activity = getValidActivity();
         ViewGroup viewGroup = getValidViewGroup();
@@ -302,6 +340,7 @@ public class SplashWrapper {
             @Override
             public void onAdDisable() {
                 super.onAdDisable();
+                LogUtils.w("splash disable");
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdDisable();
                 }
@@ -309,29 +348,14 @@ public class SplashWrapper {
 
             @Override
             public void onAdTimeTick(long tick) {
-                if (tick == 0 && !splashLaunch) {
-                    splashLaunch = true;
-                    if (!splashClicked) {
-                        if (mClockTicker != null) {
-                            mClockTicker.release();
-                        }
-                    }
-                    if (onSplashImpl != null) {
-                        onSplashImpl.onAdShouldLaunch();
-                    }
-                    return;
-                }
-                updateSkipText(tick);
-                if (!splashLaunch) {
-                    if (onSplashImpl != null) {
-                        onSplashImpl.onAdTimeTick(tick);
-                    }
-                }
             }
 
             @Override
             public void onAdWillLoad(@NonNull String platform) {
                 super.onAdWillLoad(platform);
+                LogUtils.i("splash willLoad,platform:" + adOnlineConfig.platform + ",appkey=" +
+                        adOnlineConfig.appKey + "/subkey=" + adOnlineConfig.subKey);
+                resetCount();
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdWillLoad(platform);
                 }
@@ -340,7 +364,7 @@ public class SplashWrapper {
             @Override
             public void onAdDisplay(@NonNull String platform) {
                 super.onAdDisplay(platform);
-                resetCount();
+                LogUtils.w("splash display,platform:" + adOnlineConfig.platform);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdDisplay(platform);
                 }
@@ -349,7 +373,7 @@ public class SplashWrapper {
             @Override
             public void onAdClicked(@NonNull String platform) {
                 super.onAdClicked(platform);
-                splashClicked = true;
+                LogUtils.i("splash clicked,platform:" + adOnlineConfig.platform);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdClicked(platform);
                 }
@@ -358,27 +382,29 @@ public class SplashWrapper {
             @Override
             public void onAdClosed(@NonNull String platform) {
                 super.onAdClosed(platform);
+                LogUtils.i("splash closed,platform:" + adOnlineConfig.platform);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdClosed(platform);
                 }
-                if (!splashLaunch && !splashClicked) {
-                    splashLaunch = true;
-                    if (mClockTicker != null) {
-                        mClockTicker.release();
-                    }
-                    if (onSplashImpl != null) {
-                        onSplashImpl.onAdShouldLaunch();
-                    }
+                Activity activity = getValidActivity();
+                if (activity == null) {
+                    return;
+                }
+                if (!isForeground) {
+                    return;
+                }
+                if (onSplashImpl != null && !isLaunched) {
+                    LogUtils.i("倒计时结束跳转");
+                    isLaunched = true;
+                    onSplashImpl.onAdShouldLaunch();
                 }
             }
 
             @Override
             public void onAdShouldLaunch() {
-                splashLaunch = true;
-                if (mClockTicker != null) {
-                    mClockTicker.release();
-                }
-                if (onSplashImpl != null) {
+                if (onSplashImpl != null && !isLaunched) {
+                    LogUtils.i("splash closed,platform:" + adOnlineConfig.platform);
+                    isLaunched = true;
                     onSplashImpl.onAdShouldLaunch();
                 }
             }
@@ -387,6 +413,8 @@ public class SplashWrapper {
             public void onAdFailed(@NonNull String platform, int errorCode,
                                    @NonNull String errorMsg) {
                 super.onAdFailed(platform, errorCode, errorMsg);
+                LogUtils.w("splash failed,platform:" + adOnlineConfig.platform + ",appkey=" +
+                        adOnlineConfig.appKey + "/subkey=" + adOnlineConfig.subKey);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdFailed(platform, errorCode, errorMsg);
                 }
@@ -417,11 +445,8 @@ public class SplashWrapper {
         countTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                splashLaunch = true;
-                if (mClockTicker != null) {
-                    mClockTicker.release();
-                }
-                if (onSplashImpl != null) {
+                if (onSplashImpl != null && !isLaunched) {
+                    isLaunched = true;
                     onSplashImpl.onAdShouldLaunch();
                 }
             }

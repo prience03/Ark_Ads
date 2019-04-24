@@ -1,16 +1,16 @@
 package com.ark.sample;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
 import com.ark.adkit.basics.configs.ADPlatform;
 import com.ark.adkit.basics.handler.Action;
 import com.ark.adkit.basics.handler.Run;
-import com.ark.adkit.basics.models.OnSplashImpl;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.ark.adkit.polymers.polymer.ADTool;
 import com.ark.adkit.polymers.polymer.interrcmd.RecommendDialog;
@@ -22,37 +22,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements SplashFragment.OnPreparedListener {
+public class MainActivity extends AppCompatActivity {
 
     private FrameLayout fl;
     private FrameLayout banner;
-    private SplashFragment mFragment;
     private int mIndex = 1;
     private TextView mTextView;
     private List<String> mStringList = new ArrayList<>();
 
-    private OnSplashImpl mOnSplashImpl = new OnSplashImpl() {
-        @Override
-        public void onAdTimeTick(long tick) {
-
-        }
-
-        @Override
-        public void onAdShouldLaunch() {
-            if (mFragment != null) {
-                mFragment.dismissAllowingStateLoss();
-                mFragment = null;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mFragment = new SplashFragment();
-        mFragment.setOnPreparedListener(this);
-        mFragment.show(getSupportFragmentManager(), "splash");
         fl = findViewById(R.id.fl_container);
         banner = findViewById(R.id.fl_banner);
         mTextView = findViewById(R.id.text);
@@ -75,38 +57,6 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
     public void refresh(View view) {
         loadNative();
         loadBanner();
-    }
-
-    @Override
-    public void onCreateView(final ViewGroup rootView, final ViewGroup adContainer) {
-        loadSplash(rootView, adContainer);
-        loadBanner();
-        loadNative();
-    }
-
-    private void loadSplash(final ViewGroup rootView, final ViewGroup adContainer) {
-        ADTool.getADTool()
-                .getManager()
-                .getSplashWrapper()
-                .needPermissions(true)
-                .loadSplash(this, adContainer, rootView, mOnSplashImpl);
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        if (mFragment != null) {
-            mFragment.dismissAllowingStateLoss();
-            mFragment = null;
-        }
-    }
-
-    public void splash(View view) {
-        if (mFragment == null) {
-            mFragment = new SplashFragment();
-            mFragment.setOnPreparedListener(this);
-        }
-        mFragment.show(getSupportFragmentManager(), "splash");
     }
 
     public void rcmd(View view) {
@@ -182,7 +132,12 @@ public class MainActivity extends AppCompatActivity implements SplashFragment.On
     }
 
     public void list(View view) {
-        ListAdFragment listAdFragment = new ListAdFragment();
-        listAdFragment.show(getSupportFragmentManager(), "list");
+        startActivity(new Intent(this, ListActivity.class));
+        finish();
+    }
+
+    public void splash(View view) {
+        startActivity(new Intent(this, SplashActivity.class));
+        finish();
     }
 }

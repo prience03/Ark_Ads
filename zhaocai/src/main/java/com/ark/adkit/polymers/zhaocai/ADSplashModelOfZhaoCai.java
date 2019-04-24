@@ -39,7 +39,7 @@ public class ADSplashModelOfZhaoCai extends ADSplashModel {
             return;
         }
         if (mConfig == null) {
-            onSplashListener.onAdFailed("null", -1, "splash config is null");
+            onSplashListener.onAdFailed("wskj", -1, "splash config is null");
             return;
         }
         onSplashListener.onAdWillLoad(mConfig.platform);

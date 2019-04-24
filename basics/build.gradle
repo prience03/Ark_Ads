@@ -46,7 +46,7 @@ uploadArchives {
             }
             pom.groupId = 'com.ark.ads'
             pom.artifactId = 'basics'
-            pom.version = '1.2.0'
+            pom.version = '1.2.1'
             pom.packaging = 'aar'
         }
     }

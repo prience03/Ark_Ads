@@ -5,13 +5,13 @@
 ```groovy
 maven { url 'http://nexus.xiaoc.cn/repository/maven-releases/'}
 
-implementation 'com.ark.ads:basics:1.2.0'(必须,广告基础库)
-implementation 'com.ark.ads:core:1.2.0'(必须，广告聚合处理)
-implementation 'com.ark.ads:iflytek:1.2.0'(科大讯飞广告)
-implementation 'com.ark.ads:longyun:1.2.0'(龙云聚合广告，包含GDTUnionSDK.4.19.574.min.jar)
-implementation 'com.ark.ads:zhaocai:1.2.0'(无双科技广告,已去除广点通依赖)
-implementation 'com.ark.ads:gdt:1.2.0'(广点通单独依赖时需要拷贝GDTUnionSDK.4.19.574.min.jar)
-implementation 'com.ark.ads:ttad:1.2.0'(今日头条穿山甲广告)
+implementation 'com.ark.ads:basics:1.2.1'(必须,广告基础库)
+implementation 'com.ark.ads:core:1.2.1'(必须，广告聚合处理)
+implementation 'com.ark.ads:iflytek:1.2.1'(科大讯飞广告)
+implementation 'com.ark.ads:longyun:1.2.1'(龙云聚合广告，包含GDTUnionSDK.4.19.574.min.jar)
+implementation 'com.ark.ads:zhaocai:1.2.1'(无双科技广告,已去除广点通依赖)
+implementation 'com.ark.ads:gdt:1.2.1'(广点通单独依赖时需要拷贝GDTUnionSDK.4.19.574.min.jar)
+implementation 'com.ark.ads:ttad:1.2.1'(今日头条穿山甲广告)
 ```
 
 ### Gradle   version 2.x (GDTUnionSDK>=4.20,ZhaoCai_Ad_SDK>=3.0)
@@ -33,19 +33,17 @@ ADTool.initialize(new ADTool.Builder()
         //.setLocalConfig(JsonUtils.getJson(this,"localconfig.json"))//使用本地json字符串配置
         .setDebugMode(BuildConfig.DEBUG)//调试模式（日志打印，平台标识）
         .build());
-
-
 ```
 #### 广告使用
 ##### 1.开屏
 ```java
 /**
  * 加载开屏广告
- * @param adContainer 广告展示容器
- * @param skipViewGroup 跳过按钮所在父容器
+ * @param adContainer  广告展示容器
+ * @param rootView     跳过按钮所在父容器(根容器，最好和广告容器分开(不要使用LinearLayout，否则跳过按钮可能不可见)
  * @param onSplashImpl 开屏回调
  */
- public void loadSplash(ViewGroup adContainer, ViewGroup skipViewGroup, OnSplashImpl onSplashImpl) {
+ public void loadSplash(ViewGroup adContainer, ViewGroup rootView, OnSplashImpl onSplashImpl) {
     ADTool.getADTool().getManager()
             .getSplashWrapper()
             .needPermissions(true)//是否由SDK申请必要权限

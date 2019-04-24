@@ -22,6 +22,9 @@ public class ClockTicker {
     }
 
     public void start() {
+        if (mHandler != null && mTicker != null) {
+            mHandler.removeCallbacks(mTicker);
+        }
         mTickerStopped = false;
         mHandler = new Handler();
         mTicker = new Runnable() {
@@ -54,7 +57,6 @@ public class ClockTicker {
             }
         };
         mTicker.run();
-
     }
 
     public long dealTime(long time) {
@@ -63,18 +65,7 @@ public class ClockTicker {
 
     public void release() {
         mTickerStopped = true;
-    }
-
-    /**
-     * 回收后启动
-     */
-    public void changeTicker(boolean mTickerStopped) {
-        this.mTickerStopped = mTickerStopped;
-        if (!mTickerStopped) {
-            mHandler.post(mTicker);
-        } else {
-            mHandler.removeCallbacks(mTicker);
-        }
+        mHandler.removeCallbacks(mTicker);
     }
 
     public interface ClockListener {
