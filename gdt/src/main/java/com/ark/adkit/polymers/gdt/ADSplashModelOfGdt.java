@@ -13,6 +13,8 @@ import com.qq.e.comm.util.AdError;
 
 public class ADSplashModelOfGdt extends ADSplashModel {
 
+    private SplashAD splashAD;
+
     @Override
     protected void loadSplash(@NonNull final OnSplashListener onSplashListener) {
         final ViewGroup viewGroup = getValidViewGroup();
@@ -35,7 +37,7 @@ public class ADSplashModelOfGdt extends ADSplashModel {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    new SplashAD(activity, viewGroup, mConfig.appKey, mConfig.subKey,
+                    splashAD = new SplashAD(activity, viewGroup, mConfig.appKey, mConfig.subKey,
                             new SplashADListener() {
                                 @Override
                                 public void onADDismissed() {
@@ -80,4 +82,9 @@ public class ADSplashModelOfGdt extends ADSplashModel {
         }
     }
 
+    @Override
+    public void release() {
+        super.release();
+        splashAD = null;
+    }
 }

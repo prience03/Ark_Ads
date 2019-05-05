@@ -16,6 +16,8 @@ import com.bytedance.sdk.openadsdk.TTSplashAd;
 
 public class ADSplashModelOfTT extends ADSplashModel {
 
+    private TTAdNative ttAdNative;
+
     @Override
     protected void loadSplash(@NonNull final OnSplashListener onSplashListener) {
         final ViewGroup viewGroup = getValidViewGroup();
@@ -35,7 +37,7 @@ public class ADSplashModelOfTT extends ADSplashModel {
             return;
         }
         try {
-            final TTAdNative ttAdNative = TTAdManagerHolder.getInstance(activity, mConfig.appKey)
+            ttAdNative = TTAdManagerHolder.getInstance(activity, mConfig.appKey)
                     .createAdNative(activity);
             LogUtils.i("load splash,subKey:" + mConfig.subKey);
             AdSlot adSlot = new AdSlot.Builder()
@@ -89,5 +91,11 @@ public class ADSplashModelOfTT extends ADSplashModel {
         } catch (Exception e) {
             onSplashListener.onAdFailed(mConfig.platform, -2, e.getLocalizedMessage());
         }
+    }
+
+    @Override
+    public void release() {
+        super.release();
+        ttAdNative = null;
     }
 }

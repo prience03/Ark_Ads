@@ -21,7 +21,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
 import com.ark.adkit.basics.configs.ADConfig;
 import com.ark.adkit.basics.configs.ADOnlineConfig;
 import com.ark.adkit.basics.configs.ADStyle;
@@ -40,6 +39,7 @@ import com.ark.utils.permissions.PermissionSimpleCallback;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,6 +57,7 @@ public class SplashWrapper {
     private OnSplashImpl onSplashImpl;
     private boolean isLaunched;
     private boolean isForeground;
+    private Map<String, ADSplashModel> adSplashModelMap = new HashMap<>();
 
     /**
      * 配置参数
@@ -159,6 +160,12 @@ public class SplashWrapper {
                         mContainerRef.clear();
                         mContainerRef = null;
                     }
+                    for (String key : adSplashModelMap.keySet()) {
+                        ADSplashModel adSplashModel = adSplashModelMap.get(key);
+                        adSplashModel.release();
+                        adSplashModel = null;
+                    }
+                    adSplashModelMap = null;
                     LogUtils.i("splash destroy ,release SplashADs");
                 }
             });
@@ -307,6 +314,7 @@ public class SplashWrapper {
             adOnlineConfig.platform = sortStr;
             adOnlineConfig.adStyle = ADStyle.POS_SPLASH;
             final ADSplashModel adSplashModel = ADSplashFactory.createSplash(sortStr);
+            adSplashModelMap.put(sortStr, adSplashModel);
             if (adSplashModel == null) {
                 Run.onUiAsync(new Action() {
                     @Override

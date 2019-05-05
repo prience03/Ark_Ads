@@ -86,4 +86,15 @@ public class ADSplashModelOfLongYun extends ADSplashModel {
             onSplashListener.onAdFailed(mConfig.platform, -3, e.getMessage());
         }
     }
+
+    @Override
+    public void release() {
+        super.release();
+        final Activity activity = getValidActivity();
+        if (activity == null) {
+            return;
+        }
+        AdViewSplashManager.getInstance(activity)
+                .destory();
+    }
 }

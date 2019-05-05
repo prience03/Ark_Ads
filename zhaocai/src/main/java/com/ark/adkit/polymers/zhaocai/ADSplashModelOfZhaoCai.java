@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.ViewGroup;
 import com.ark.adkit.basics.configs.ADOnlineConfig;
 import com.ark.adkit.basics.models.ADSplashModel;
@@ -18,6 +17,7 @@ import com.zhaocai.ad.sdk.ZhaoCaiSplashListener;
 public class ADSplashModelOfZhaoCai extends ADSplashModel {
 
     private AdConfiguration adConfiguration;
+    private ZhaoCaiSplash zhaoCaiSplash;
 
     private AdConfiguration getAdConfiguration(Context context, @NonNull ADOnlineConfig adOnlineConfig) {
         if (adConfiguration != null) {
@@ -52,8 +52,8 @@ public class ADSplashModelOfZhaoCai extends ADSplashModel {
             adConfiguration = getAdConfiguration(activity, mConfig);
         }
         try {
-            ZhaoCaiSplash splash = new ZhaoCaiSplash(viewGroup, adConfiguration, 5000L);
-            splash.addListener(new ZhaoCaiSplashListener() {
+            zhaoCaiSplash = new ZhaoCaiSplash(viewGroup, adConfiguration, 5000L);
+            zhaoCaiSplash.addListener(new ZhaoCaiSplashListener() {
                 @Override
                 public void onDismissed() {
                     onSplashListener.onAdClosed(mConfig.platform);
@@ -79,9 +79,16 @@ public class ADSplashModelOfZhaoCai extends ADSplashModel {
                     onSplashListener.onAdClicked(mConfig.platform);
                 }
             });
-            splash.loadAd();
+            zhaoCaiSplash.loadAd();
         } catch (Exception e) {
             onSplashListener.onAdFailed(mConfig.platform, -3, e.getMessage());
         }
+    }
+
+    @Override
+    public void release() {
+        super.release();
+        zhaoCaiSplash = null;
+        adConfiguration = null;
     }
 }

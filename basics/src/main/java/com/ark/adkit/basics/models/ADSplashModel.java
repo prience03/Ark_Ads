@@ -43,5 +43,9 @@ public abstract class ADSplashModel {
         }
         return null;
     }
+
+    public void release(){
+
+    }
 }
 

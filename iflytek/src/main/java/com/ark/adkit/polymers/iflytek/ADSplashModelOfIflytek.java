@@ -16,6 +16,8 @@ import java.util.List;
 
 public class ADSplashModelOfIflytek extends ADSplashModel {
 
+    private IFLYNativeAd mNativeAD;
+
     @Override
     protected void loadSplash(@NonNull final OnSplashListener onSplashListener) {
         final ViewGroup viewGroup = getValidViewGroup();
@@ -38,7 +40,7 @@ public class ADSplashModelOfIflytek extends ADSplashModel {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    IFLYNativeAd mNativeAD = new IFLYNativeAd(activity, mConfig.subKey,
+                    mNativeAD = new IFLYNativeAd(activity, mConfig.subKey,
                             new IFLYNativeListener() {
                                 @Override
                                 public void onADLoaded(List<NativeADDataRef> dataRefs) {
@@ -107,5 +109,11 @@ public class ADSplashModelOfIflytek extends ADSplashModel {
         } catch (Exception e) {
             LogUtils.e("拉取广告时出错{" + e.getLocalizedMessage() + "}");
         }
+    }
+
+    @Override
+    public void release() {
+        super.release();
+        mNativeAD = null;
     }
 }
