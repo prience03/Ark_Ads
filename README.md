@@ -5,13 +5,13 @@
 ```groovy
 maven { url 'http://nexus.xiaoc.cn/repository/maven-releases/'}
 
-implementation 'com.ark.ads:basics:1.2.1'(必须,广告基础库)
-implementation 'com.ark.ads:core:1.2.1'(必须，广告聚合处理)
-implementation 'com.ark.ads:iflytek:1.2.1'(科大讯飞广告)
-implementation 'com.ark.ads:longyun:1.2.1'(龙云聚合广告，包含GDTUnionSDK.4.19.574.min.jar)
-implementation 'com.ark.ads:zhaocai:1.2.1'(无双科技广告,已去除广点通依赖)
-implementation 'com.ark.ads:gdt:1.2.1'(广点通单独依赖时需要拷贝GDTUnionSDK.4.19.574.min.jar)
-implementation 'com.ark.ads:ttad:1.2.1'(今日头条穿山甲广告)
+implementation 'com.ark.ads:basics:1.2.2'(必须,广告基础库)
+implementation 'com.ark.ads:core:1.2.2'(必须，广告聚合处理)
+implementation 'com.ark.ads:iflytek:1.2.2'(科大讯飞广告)
+implementation 'com.ark.ads:longyun:1.2.2'(龙云聚合广告，包含GDTUnionSDK.4.19.574.min.jar)
+implementation 'com.ark.ads:zhaocai:1.2.2'(无双科技广告,已去除广点通依赖)
+implementation 'com.ark.ads:gdt:1.2.2'(广点通单独依赖时需要拷贝GDTUnionSDK.4.19.574.min.jar)
+implementation 'com.ark.ads:ttad:1.2.2'(今日头条穿山甲广告)
 ```
 
 ### Gradle   version 2.x (GDTUnionSDK>=4.20,ZhaoCai_Ad_SDK>=3.0)
