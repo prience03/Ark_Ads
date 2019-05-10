@@ -43,7 +43,7 @@ dependencies {
     compileOnly project(':gdt')
     compileOnly project (':basics')
     api 'com.ark.ads:imageview:1.0.0'
-    api 'com.ark.custom:permissions:1.0.0'
+    api 'com.ark.custom:permissions:1.0.2'
     api 'com.ark.custom:kvalue:1.0.0'
     api 'com.ark.custom:webview:1.0.0'
 }
@@ -62,7 +62,7 @@ uploadArchives {
             }
             pom.groupId = 'com.ark.ads'
             pom.artifactId = 'core'
-            pom.version = '1.2.2'
+            pom.version = '1.2.3'
             pom.packaging = 'aar'
         }
     }

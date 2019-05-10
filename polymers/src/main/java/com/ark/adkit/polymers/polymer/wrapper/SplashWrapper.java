@@ -43,21 +43,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class SplashWrapper {
 
+    @Nullable
     protected List<PermissionItem> mPermissionItemArrayList = new ArrayList<>();
     protected boolean mRequestPermissions = true;
+    @Nullable
+    private Map<String, ADSplashModel> adSplashModelMap = new HashMap<>();
+    @Nullable
     private WeakReference<Activity> mActivityRef;
+    @Nullable
     private WeakReference<ViewGroup> mContainerRef;
+    @Nullable
     private WeakReference<ViewGroup> mRootViewRef;
+    @Nullable
     private WeakReference<TextView> mTextRef;
+    @Nullable
     private ClockTicker mClockTicker;
     private int index = 0;
     @Nullable
     private OnSplashImpl onSplashImpl;
     private boolean isLaunched;
     private boolean isForeground;
-    private Map<String, ADSplashModel> adSplashModelMap = new HashMap<>();
+    private boolean isDisplayed;
 
     /**
      * 配置参数
@@ -116,6 +125,112 @@ public class SplashWrapper {
     }
 
     /**
+     * 是否成功展示了广告
+     *
+     * @return true/false
+     */
+    public boolean isDisplayed() {
+        return isDisplayed;
+    }
+
+    /**
+     * 获取回调
+     *
+     * @return OnSplashImpl
+     */
+    @Nullable
+    protected OnSplashImpl getOnSplashImpl() {
+        return onSplashImpl;
+    }
+
+    /**
+     * 获取已经加载过的开屏广告
+     *
+     * @return Map
+     */
+    @Nullable
+    protected Map<String, ADSplashModel> getModels() {
+        return adSplashModelMap;
+    }
+
+    /**
+     * 获取开屏有效宿主Activity
+     *
+     * @return Activity
+     */
+    protected Activity getValidActivity() {
+        if (mActivityRef != null) {
+            Activity activity = mActivityRef.get();
+            if (activity != null && !activity.isFinishing()) {
+                return activity;
+            }
+        }
+        return null;
+    }
+
+    protected ViewGroup getValidViewGroup() {
+        return mContainerRef == null ? null : mContainerRef.get();
+    }
+
+    protected ViewGroup getValidRootView() {
+        return mRootViewRef == null ? null : mRootViewRef.get();
+    }
+
+    protected TextView getValidSkipTextView() {
+        return mTextRef == null ? null : mTextRef.get();
+    }
+
+    /**
+     * 释放倒计时
+     */
+    protected void releaseSplashTicker() {
+        if (mClockTicker != null) {
+            mClockTicker.release();
+            mClockTicker = null;
+        }
+    }
+
+    /**
+     * 释放已经加载了的开屏广告
+     */
+    protected void releaseSplashModels() {
+        if (adSplashModelMap != null) {
+            for (String key : adSplashModelMap.keySet()) {
+                ADSplashModel adSplashModel = adSplashModelMap.get(key);
+                adSplashModel.release();
+            }
+            adSplashModelMap = null;
+        }
+    }
+
+    /**
+     * 释放引用
+     */
+    protected void releaseSplashRefs() {
+        if (mActivityRef != null) {
+            mActivityRef.clear();
+            mActivityRef = null;
+        }
+        if (mRootViewRef != null) {
+            mRootViewRef.clear();
+            mRootViewRef = null;
+        }
+        if (mContainerRef != null) {
+            mContainerRef.clear();
+            mContainerRef = null;
+        }
+    }
+
+    /**
+     * 释放资源
+     */
+    public void release() {
+        releaseSplashModels();
+        releaseSplashTicker();
+        releaseSplashRefs();
+    }
+
+    /**
      * 加载开屏
      *
      * @param mActivity    上下文
@@ -144,32 +259,12 @@ public class SplashWrapper {
                 @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
                 void onDestroy() {
                     LogUtils.i("onActivityDestroyed");
-                    if (mClockTicker != null) {
-                        mClockTicker.release();
-                        mClockTicker = null;
-                    }
-                    if (mActivityRef != null) {
-                        mActivityRef.clear();
-                        mActivityRef = null;
-                    }
-                    if (mRootViewRef != null) {
-                        mRootViewRef.clear();
-                        mRootViewRef = null;
-                    }
-                    if (mContainerRef != null) {
-                        mContainerRef.clear();
-                        mContainerRef = null;
-                    }
-                    for (String key : adSplashModelMap.keySet()) {
-                        ADSplashModel adSplashModel = adSplashModelMap.get(key);
-                        adSplashModel.release();
-                        adSplashModel = null;
-                    }
-                    adSplashModelMap = null;
+                    release();
                     LogUtils.i("splash destroy ,release SplashADs");
                 }
             });
         }
+        isDisplayed = false;
         isLaunched = false;
         this.onSplashImpl = onSplashImpl;
         if (rootView instanceof LinearLayout) {
@@ -266,28 +361,6 @@ public class SplashWrapper {
         loadOneByOne(mADConfig);
     }
 
-    private Activity getValidActivity() {
-        if (mActivityRef != null) {
-            Activity activity = mActivityRef.get();
-            if (activity != null && !activity.isFinishing()) {
-                return activity;
-            }
-        }
-        return null;
-    }
-
-    private ViewGroup getValidViewGroup() {
-        return mContainerRef == null ? null : mContainerRef.get();
-    }
-
-    private ViewGroup getValidRootView() {
-        return mRootViewRef == null ? null : mRootViewRef.get();
-    }
-
-    private TextView getValidSkipTextView() {
-        return mTextRef == null ? null : mTextRef.get();
-    }
-
     /**
      * 实际加载开屏操作
      *
@@ -313,8 +386,10 @@ public class SplashWrapper {
             adOnlineConfig.subKey = mADConfig.getSubKey(sortStr);
             adOnlineConfig.platform = sortStr;
             adOnlineConfig.adStyle = ADStyle.POS_SPLASH;
-            final ADSplashModel adSplashModel = ADSplashFactory.createSplash(sortStr);
-            adSplashModelMap.put(sortStr, adSplashModel);
+            ADSplashModel adSplashModel = ADSplashFactory.createSplash(sortStr);
+            if (adSplashModelMap != null) {
+                adSplashModelMap.put(sortStr, adSplashModel);
+            }
             if (adSplashModel == null) {
                 Run.onUiAsync(new Action() {
                     @Override
@@ -326,7 +401,7 @@ public class SplashWrapper {
                 Run.onUiAsync(new Action() {
                     @Override
                     public void call() {
-                        splashModelLoad(adSplashModel, adOnlineConfig, mADConfig);
+                        splashModelLoad(sortStr, adOnlineConfig, mADConfig);
                     }
                 });
             }
@@ -335,12 +410,16 @@ public class SplashWrapper {
         }
     }
 
-    private void splashModelLoad(@NonNull ADSplashModel adSplashModel,
+    private void splashModelLoad(@NonNull String sortStr,
                                  @NonNull final ADOnlineConfig adOnlineConfig,
                                  @NonNull final ADConfig mADConfig) {
         Activity activity = getValidActivity();
         ViewGroup viewGroup = getValidViewGroup();
         if (activity == null || viewGroup == null) {
+            return;
+        }
+        ADSplashModel adSplashModel;
+        if (adSplashModelMap == null || (adSplashModel = adSplashModelMap.get(sortStr)) == null) {
             return;
         }
         adSplashModel.initModel(adOnlineConfig);
@@ -372,6 +451,7 @@ public class SplashWrapper {
             @Override
             public void onAdDisplay(@NonNull String platform) {
                 super.onAdDisplay(platform);
+                isDisplayed = true;
                 LogUtils.w("splash display,platform:" + adOnlineConfig.platform);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdDisplay(platform);
