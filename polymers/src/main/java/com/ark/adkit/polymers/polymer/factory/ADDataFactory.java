@@ -80,10 +80,10 @@ public class ADDataFactory {
     private static ADMetaData createZhaoCaiData(Object o) {
         try {
             Class.forName("com.ark.adkit.polymers.zhaocai.ADMetaDataOfZhaoCai");
-            Class.forName("com.zhaocai.ad.sdk.ZhaoCaiNative");
+            Class.forName("com.zhaocai.ad.sdk.log.advanced.ZhaoCaiNativeAdvanced");
             if (o instanceof com.zhaocai.ad.sdk.ZhaoCaiNative) {
                 return new com.ark.adkit.polymers.zhaocai.ADMetaDataOfZhaoCai(
-                        (com.zhaocai.ad.sdk.ZhaoCaiNative) o);
+                        (com.zhaocai.ad.sdk.log.advanced.ZhaoCaiNativeAdvanced) o);
             }
         } catch (ClassNotFoundException e) {
             //

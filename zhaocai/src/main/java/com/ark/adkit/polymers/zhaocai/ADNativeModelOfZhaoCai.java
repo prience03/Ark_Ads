@@ -10,6 +10,7 @@ import com.ark.adkit.basics.handler.Run;
 import com.ark.adkit.basics.models.ADNativeModel;
 import com.ark.adkit.basics.utils.LogUtils;
 import com.zhaocai.ad.sdk.*;
+import com.zhaocai.ad.sdk.log.advanced.ZhaoCaiNativeAdvanced;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
@@ -19,10 +20,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ADNativeModelOfZhaoCai extends ADNativeModel {
 
     private AdConfiguration adConfiguration;
-    private ZhaoCaiFeed mNativeAD;
-    private ZhaoCaiFeedListener mListener = new ZhaoCaiFeedListener() {
+    private ZhaoCaiFeedAdvanced mNativeAD;
+    private ZhaoCaiFeedAdvancedListener mListener = new ZhaoCaiFeedAdvancedListener() {
         @Override
-        public void onFeedLoad(List<ZhaoCaiNative> list) {
+        public void onFeedLoad(List<ZhaoCaiNativeAdvanced> list) {
             if (mConfig.platform != null
                     && list != null) {
                 handleSuccess(mConfig.platform, list);
@@ -66,7 +67,7 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
                 //上下文切换后重新初始化
                 if (lastContext == null || lastContext != context) {
                     LogUtils.i("wskj上下文变化,重新初始化");
-                    mNativeAD = new ZhaoCaiFeed(context,
+                    mNativeAD = new ZhaoCaiFeedAdvanced(context,
                             getAdConfiguration(context, mConfig, count));
                     mNativeAD.addListener(mListener);
                 }
@@ -74,7 +75,7 @@ public class ADNativeModelOfZhaoCai extends ADNativeModel {
             contextRef = new WeakReference<>(context);
             if (mNativeAD == null) {
                 LogUtils.i("wskj初始化广告");
-                mNativeAD = new ZhaoCaiFeed(context, getAdConfiguration(context, mConfig, count));
+                mNativeAD = new ZhaoCaiFeedAdvanced(context, getAdConfiguration(context, mConfig, count));
                 mNativeAD.addListener(mListener);
             }
             mNativeAD.loadAd();

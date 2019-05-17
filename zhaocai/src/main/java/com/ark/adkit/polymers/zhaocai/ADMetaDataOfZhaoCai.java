@@ -9,20 +9,18 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import com.ark.adkit.basics.configs.ADPlatform;
 import com.ark.adkit.basics.data.ADMetaData;
-import com.ark.adkit.basics.utils.LogUtils;
+import com.zhaocai.ad.sdk.ZCNativeInteractionAdvancedListener;
 import com.zhaocai.ad.sdk.ZhaoCaiConstant;
-import com.zhaocai.ad.sdk.ZhaoCaiImage;
-import com.zhaocai.ad.sdk.ZhaoCaiNative;
-import com.zhaocai.ad.sdk.ZhaoCaiNativeInteractionListener;
+import com.zhaocai.ad.sdk.log.advanced.ZhaoCaiNativeAdvanced;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ADMetaDataOfZhaoCai extends ADMetaData {
 
-    private final ZhaoCaiNative mZhaoCaiNative;
+    private final ZhaoCaiNativeAdvanced mZhaoCaiNative;
 
-    public ADMetaDataOfZhaoCai(@NonNull ZhaoCaiNative mZhaoCaiNative) {
+    public ADMetaDataOfZhaoCai(@NonNull ZhaoCaiNativeAdvanced mZhaoCaiNative) {
         this.mZhaoCaiNative = mZhaoCaiNative;
     }
 
@@ -51,7 +49,7 @@ public class ADMetaDataOfZhaoCai extends ADMetaData {
     @NonNull
     @Override
     public String getSubTitle() {
-        String subTitle = mZhaoCaiNative.getDescription();
+        String subTitle = mZhaoCaiNative.getDesc();
         if (TextUtils.isEmpty(subTitle)) {
             subTitle = "";
         }
@@ -61,28 +59,23 @@ public class ADMetaDataOfZhaoCai extends ADMetaData {
     @NonNull
     @Override
     public String getImgUrl() {
-        List<ZhaoCaiImage> list = mZhaoCaiNative.getImageList();
-        return list != null && list.size() > 0 ? list.get(0).getImageUrl() : "";
+        List<String> list = mZhaoCaiNative.getImageList();
+        return list != null && list.size() > 0 ? list.get(0) : "";
     }
 
     @NonNull
     @Override
     public String getLogoUrl() {
-        String logoUrl = mZhaoCaiNative.getIcon().getImageUrl();
+        String logoUrl = mZhaoCaiNative.getIconUrl();
         return TextUtils.isEmpty(logoUrl) ? getImgUrl() : logoUrl;
     }
 
     @NonNull
     @Override
     public List<String> getImgUrls() {
-        List<ZhaoCaiImage> list = mZhaoCaiNative.getImageList();
+        List<String> list = mZhaoCaiNative.getImageList();
         List<String> mList = new ArrayList<>();
-        if (list != null && !list.isEmpty()) {
-            for (ZhaoCaiImage image : list) {
-                mList.add(image.getImageUrl());
-            }
-        }
-        return mList;
+        return list == null ? mList : list;
     }
 
     @Override
@@ -101,23 +94,21 @@ public class ADMetaDataOfZhaoCai extends ADMetaData {
                         } else {
                             viewGroup.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         }
-                        mZhaoCaiNative.registerViewForInteraction(viewGroup,
-                                new ZhaoCaiNativeInteractionListener() {
+                        mZhaoCaiNative.registerViewForInteraction(viewGroup, mZhaoCaiNative.getOriginalView(),
+                                new ZCNativeInteractionAdvancedListener() {
                                     @Override
-                                    public void onAdClicked(View view,
-                                            ZhaoCaiNative zhaoCaiNative) {
-                                        LogUtils.i("wskj click" + zhaoCaiNative.getTitle());
-                                    }
-
-                                    @Override
-                                    public void onAdCreativeClick(View view,
-                                            ZhaoCaiNative zhaoCaiNative) {
+                                    public void onAdClicked(ZhaoCaiNativeAdvanced zhaoCaiNativeAdvanced) {
 
                                     }
 
                                     @Override
-                                    public void onAdShow(ZhaoCaiNative zhaoCaiNative) {
-                                        LogUtils.i("wskj show" + zhaoCaiNative.getTitle());
+                                    public void onAdShow(ZhaoCaiNativeAdvanced zhaoCaiNativeAdvanced) {
+
+                                    }
+
+                                    @Override
+                                    public void onADError(int i, String s) {
+
                                     }
                                 });
                     }

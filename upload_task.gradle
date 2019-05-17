@@ -14,6 +14,6 @@ artifacts {
     archives androidJavadocsJar
 }
 uploadArchives.mustRunAfter('build')
-uploadArchives << {
+uploadArchives {
     println "Uploaded success"
 }

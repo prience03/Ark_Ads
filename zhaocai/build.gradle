@@ -35,9 +35,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compileOnly project (':basics')
-    api 'com.ark.res:ZhaoCai_Ad_SDK:2.9.0@aar'
-    api 'com.squareup.okhttp3:okhttp:3.12.0'
-    api 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    api 'com.ark.res:ZhaoCai_Ad_SDK:3.2.0@aar'
+    api 'com.squareup.okhttp3:okhttp:3.12.1'
+    api 'com.squareup.okhttp3:logging-interceptor:3.12.1'
 }
 
 Properties properties = new Properties()
@@ -54,7 +54,7 @@ uploadArchives {
             }
             pom.groupId = 'com.ark.ads'
             pom.artifactId = 'zhaocai'
-            pom.version = '1.2.3'
+            pom.version = '2.0.0'
             pom.packaging = 'aar'
         }
     }
