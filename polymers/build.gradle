@@ -42,7 +42,7 @@ dependencies {
     compileOnly project(':zhaocai')
     compileOnly project(':gdt')
     compileOnly project (':basics')
-    api 'com.ark.ads:imageview:1.0.0'
+    api 'com.ark.ads:imageview:1.0.1'
     api 'com.ark.custom:permissions:1.0.3'
     api 'com.ark.custom:kvalue:1.0.1'
     api 'com.ark.custom:webview:1.0.1'
