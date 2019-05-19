@@ -1,1 +1,1 @@
-include ':app', ':basics', ':polymers', ':iflytek', ':longyun', ':zhaocai', ':ttad', ':gdt'
+include ':app', ':basics', ':polymers', ':iflytek', ':longyun', ':zhaocai', ':ttad', ':gdt', ':imageview'
