@@ -48,15 +48,8 @@ public class SplashActivity extends AppCompatActivity {
 				.getManager()
 				.getSplashWrapper()
 				.needPermissions(true)
+				.isVipSkip(false)
+				.setMills(3000,6000,100)
 				.loadSplash(this, adContainer, rootView, mOnSplashImpl);
-	}
-
-	@Override
-	protected void onRestart() {
-		super.onRestart();
-		if (!isFinishing()) {
-			startActivity(new Intent(SplashActivity.this, MainActivity.class));
-			finish();
-		}
 	}
 }
