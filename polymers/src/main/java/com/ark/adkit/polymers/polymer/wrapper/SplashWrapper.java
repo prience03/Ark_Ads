@@ -50,7 +50,7 @@ public class SplashWrapper {
     protected List<PermissionItem> mPermissionItemArrayList = new ArrayList<>();
     protected boolean mRequestPermissions = true;
     protected boolean isVipSkipSplash;
-    protected long delayMills = 3000, countDownMills = 5000,interval=500;
+    protected long delayMills = 3000, countDownMills = 5000, interval = 500;
     private Map<String, ADSplashModel> adSplashModelMap;
     private WeakReference<Activity> mActivityRef;
     private WeakReference<ViewGroup> mContainerRef;
@@ -106,6 +106,10 @@ public class SplashWrapper {
 
     public boolean isTimerNotStart() {
         return countDownTimer == null || countDownTimer.getState() == State.TIMER_NOT_START;
+    }
+
+    public boolean isTimerPaused() {
+        return countDownTimer != null && countDownTimer.getState() == State.TIMER_PAUSED;
     }
 
     /**
@@ -496,14 +500,6 @@ public class SplashWrapper {
                 LogUtils.i("splash closed,platform:" + adOnlineConfig.platform);
                 if (onSplashImpl != null) {
                     onSplashImpl.onAdClosed(platform);
-                }
-                Activity activity = getValidActivity();
-                if (activity == null) {
-                    return;
-                }
-                if (onSplashImpl != null) {
-                    LogUtils.i("倒计时结束跳转");
-                    onSplashImpl.onAdShouldLaunch();
                 }
             }
 

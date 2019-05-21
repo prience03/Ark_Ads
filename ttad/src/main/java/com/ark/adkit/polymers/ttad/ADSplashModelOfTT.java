@@ -65,10 +65,6 @@ public class ADSplashModelOfTT extends ADSplashModel {
                         @Override
                         public void onAdClicked(View view, int i) {
                             onSplashListener.onAdClicked(mConfig.platform);
-                            if (ttSplashAd.getInteractionType()
-                                    == TTAdConstant.FALLBACK_TYPE_DOWNLOAD) {
-                                onSplashListener.onAdShouldLaunch();
-                            }
                         }
 
                         @Override
@@ -83,7 +79,7 @@ public class ADSplashModelOfTT extends ADSplashModel {
 
                         @Override
                         public void onAdTimeOver() {
-                            onSplashListener.onAdShouldLaunch();
+                            onSplashListener.onAdClosed(mConfig.platform);
                         }
                     });
                 }

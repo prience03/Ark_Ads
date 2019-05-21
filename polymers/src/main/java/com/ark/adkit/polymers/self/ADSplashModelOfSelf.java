@@ -25,7 +25,6 @@ public class ADSplashModelOfSelf extends ADSplashModel {
             @Override
             public void onAdClick() {
                 onSplashListener.onAdClicked(mConfig.platform);
-                onSplashListener.onAdShouldLaunch();
             }
 
             @Override

@@ -152,9 +152,6 @@ public class ADSplashModelOfYdt extends ADSplashModel {
             @Override
             public void onAdClick(boolean isAd, boolean isApp) {
                 onSplashListener.onAdClicked("ydt");
-                if (isAd && isApp) {
-                    onSplashListener.onAdShouldLaunch();
-                }
             }
         }).loadSplash();
     }
