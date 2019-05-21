@@ -7,7 +7,7 @@
             "ad_posid_splash": "{\"ydt\":\"AZBZOPEN\",\"ttad\":\"807439842\",\"ifly\":\"4D3808498C6D36A861D1F422B241DB60\",\"wskj\":\"nQRj5Wo11485\",\"lyjh\":\"800e8a41a41726a88c0db7acbdb2d9c3\",\"gdt\":\"2060729462366984\"}",
             "ad_posid_native_detail": "{\"ydt\":\"AZBZXXLS\",\"ttad\":\"907439189\",\"ifly\":\"140151065017D9D1863A4A7E9DA6BEB8\",\"wskj\":\"nNMSD7t11487\",\"lyjh\":\"4286b5230aaaf0e3423a1e6a5bcf01ea\",\"gdt\":\"8010239334358227\"}",
             "ad_posid_video": "{\"ttad\":\"907439539\"}",
-            "ad_sort_splash_new": "[\"lyjh\"]",
+            "ad_sort_splash_new": "[\"ifly\",\"wskj\",\"ttad\",\"ifly\",\"lyjh\"]",
             "ad_sort_native": "[\"lyjh\"]",
             "ad_sort_video": "[\"ttad\"]",
             "ad_disable_all": "false",

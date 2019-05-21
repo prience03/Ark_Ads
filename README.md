@@ -48,6 +48,8 @@ ADTool.initialize(new ADTool.Builder()
             .getSplashWrapper()
             .needPermissions(true)//是否由SDK申请必要权限
             .setPermissions(list)//自定义权限列表
+            .isVipSkip(false)//用于VIP用户禁用广告
+            .setMills(3000,6000,100)//设置倒计时时间
             .loadSplash(activity, adContainer, skipViewGroup, new OnSplashImpl() {
 
                     @Override
